@@ -383,7 +383,7 @@
     padding: 0 3px;
   }
 
-  /* 2. Uske foran neeche: Full-width search bar */
+  /* 2. Right below it: Full-width search bar */
   .mobile-search-section {
     padding: 10px 14px;
     background: #fff;
@@ -438,7 +438,7 @@
     flex-shrink: 0;
   }
 
-  /* 3. Uske neeche: Category icons row (Circular Horizontal Scroll) */
+  /* 3. Below it: Category icons row (Circular Horizontal Scroll) */
   .mobile-category-row {
     background: #fff;
     padding: 12px 0 14px;
@@ -512,7 +512,7 @@
     font-weight: 700;
   }
 
-  /* 4. Uske neeche: Promotional banner carousel (Compact swipeable cards) */
+  /* 4. Below it: Promotional banner carousel (Compact swipeable cards) */
   .mobile-promo-carousel {
     padding: 12px 14px 6px;
     background: #fbf9f6;
@@ -608,7 +608,7 @@
     border-radius: 8px;
   }
 
-  /* 5. Uske neeche: Products seedhe 2-column grid mein */
+  /* 5. Below it: Products in direct 2-column grid */
   .featured {
     padding: 16px 12px 36px !important;
   }

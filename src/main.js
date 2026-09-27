@@ -223,9 +223,9 @@ function showThankYouModal(order) {
           </svg>
         </div>
       </div>
-      <span class="thankyou-tag">✦ ORDER CONFIRMED · MUBARAK HO! ✦</span>
-      <h2 id="thankyou-title">Shukriya, ${order.name || order.customer_name}!</h2>
-      <p class="thankyou-sub">Aapka order kamyabi ke sath place ho gaya hai. Hamari dispatch team jald hi aapka parcel pack karke courier ke hawale karegi.</p>
+      <span class="thankyou-tag">✦ ORDER CONFIRMED · CONGRATULATIONS! ✦</span>
+      <h2 id="thankyou-title">Thank You, ${order.name || order.customer_name}!</h2>
+      <p class="thankyou-sub">Your order has been successfully placed. Our dispatch team will pack your parcel shortly and hand it over to the courier.</p>
       
       <div class="thankyou-order-pill">
         <span>Order Number:</span> <strong>#${order.order_number}</strong>
@@ -266,13 +266,13 @@ function showThankYouModal(order) {
 
       <div class="thankyou-actions">
         <button class="button thankyou-continue-btn" id="close-thankyou-btn">Continue Shopping <span>→</span></button>
-        <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Salam Classic Cosmetics! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
+        <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello Classic Cosmetics! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
           Chat on WhatsApp <span>💬</span>
         </a>
       </div>
 
       <p class="thankyou-reassurance">
-        🔒 Parcel receive karte waqt courier rider ke samne check karne ki sahulat muyassar hai.
+        🔒 You may inspect your parcel in front of the courier rider before making payment.
       </p>
     </div>
   `;
@@ -477,7 +477,7 @@ function renderStorefrontShell(mainContentHtml) {
           <div class="footer-accordion-content">
             <div class="footer-content-inner">
               <p class="footer-desc-text">
-                Classic Cosmetics Pakistan ka ek premium beauty destination hai jo 100% original skincare, makeup aur luxurious fragrances faraham karta hai. Hum highest quality products aur customer trust par yaqeen rakhte hain.
+                Classic Cosmetics is a premium beauty destination in Pakistan that offers 100% original skincare, makeup, and luxurious fragrances. We believe in the highest quality products and customer trust.
               </p>
               <a class="footer-sub-link" href="/about" data-nav-page="/about">About Us</a>
               <a class="footer-sub-link" href="/faqs" data-nav-page="/faqs">FAQ's</a>
@@ -551,7 +551,7 @@ function renderStorefrontShell(mainContentHtml) {
         <div class="checkout-header">
           <p class="eyebrow">Fast & Secure</p>
           <h2 id="checkout-title">Delivery Details</h2>
-          <p class="checkout-tagline">Apni delivery details enter karein aur Cash on Delivery par order confirm karein.</p>
+          <p class="checkout-tagline">Enter your delivery details and confirm your order with Cash on Delivery.</p>
         </div>
         <div class="checkout-summary-bar">
           <div class="summary-left">
@@ -565,12 +565,12 @@ function renderStorefrontShell(mainContentHtml) {
         <form id="checkout-form">
           <div class="form-group">
             <label for="checkout-name">Full Name <span class="req">*</span></label>
-            <input id="checkout-name" name="name" required autocomplete="name" placeholder="Apna poora naam likhein (e.g. Areeba Khan)" />
+            <input id="checkout-name" name="name" required autocomplete="name" placeholder="Your full name (e.g. Areeba Khan)" />
           </div>
           <div class="form-group">
             <label for="checkout-phone">WhatsApp / Mobile Number <span class="req">*</span></label>
-            <input id="checkout-phone" name="phone" type="tel" required autocomplete="tel" placeholder="0300-1234567 (Delivery updates ke liye)" />
-            <small class="field-hint">Courier dispatch updates aur confirmation ke liye apna active number likhein.</small>
+            <input id="checkout-phone" name="phone" type="tel" required autocomplete="tel" placeholder="0300-1234567 (for delivery updates)" />
+            <small class="field-hint">Enter your active number for courier dispatch updates and order confirmation.</small>
           </div>
           <div class="form-group">
             <label for="checkout-address">Delivery Address <span class="req">*</span></label>
@@ -599,7 +599,7 @@ function renderStorefrontShell(mainContentHtml) {
             <span class="cod-icon">🛡️</span>
             <div class="cod-text">
               <strong>Cash on Delivery Available Across Pakistan</strong>
-              <small>Parcel haath me le kar rider ko payment karein. Delivery bilkul muft hai.</small>
+              <small>Receive the parcel, inspect it, then pay the rider. Delivery is completely free.</small>
             </div>
           </div>
           <button class="button checkout-submit-btn" type="submit">
@@ -810,7 +810,7 @@ function renderHomePage() {
         <div class="contact-info-col">
           <p class="eyebrow">Get in touch</p>
           <h2>Contact <i>Us</i></h2>
-          <p class="contact-sub">Hamara team hamesha available hai aapki madad ke liye. Kisi bhi product ya order ke baare mein seedha rabta karein.</p>
+          <p class="contact-sub">Our team is always available to help you. Reach out directly for any product or order queries.</p>
           <div class="contact-items">
             <a class="contact-item" href="tel:+923151247533"><div class="contact-icon">📞</div><div class="contact-text"><strong>Phone</strong><span>+92 315 1247533</span></div></a>
             <a class="contact-item" href="https://wa.me/923222495034" target="_blank"><div class="contact-icon">💬</div><div class="contact-text"><strong>WhatsApp</strong><span>+92 322 2495034</span></div></a>
@@ -855,7 +855,7 @@ function renderCategoryPage(categoryName) {
     <section class="page-hero-header">
       <p class="eyebrow">Collection</p>
       <h1>${categoryName}</h1>
-      <p class="page-subtitle">Pehle apna manpasand brand select karein ya category ke tamam products browse karein.</p>
+      <p class="page-subtitle">Select your preferred brand or browse all products in this category.</p>
       <div class="page-meta-pills">
         <span class="page-pill">${matchingBrands.length} Brand${matchingBrands.length === 1 ? '' : 's'}</span>
         <span class="page-pill">${categoryProducts.length} Product${categoryProducts.length === 1 ? '' : 's'}</span>
@@ -886,7 +886,7 @@ function renderCategoryPage(categoryName) {
         </div>
       ` : `
         <div class="empty-state" style="padding: 40px 20px; text-align: center; background: #fff; border-radius: 12px; border: 1px dashed #ded5c8;">
-          <p style="font-size: 15px; color: #777; margin-bottom: 16px;">Is category ke liye alag brands register nahi hain. Neeche tamam products browse karein.</p>
+          <p style="font-size: 15px; color: #777; margin-bottom: 16px;">No brands have been registered for this category yet. Browse all products below.</p>
         </div>
       `}
 
@@ -931,7 +931,7 @@ function renderBrandPage(categoryName, brandName) {
     <section class="page-hero-header">
       <p class="eyebrow">${categoryName} · Brand Showcase</p>
       <h1>${brandName}</h1>
-      <p class="page-subtitle">${brandName} ke tamam authentic beauty aur personal care products jo ${categoryName} collection me dastiyab hain.</p>
+      <p class="page-subtitle">All authentic ${brandName} beauty and personal care products available in the ${categoryName} collection.</p>
       <div class="page-meta-pills">
         <span class="page-pill">${brandProducts.length} Product${brandProducts.length === 1 ? '' : 's'}</span>
         <span class="page-pill">100% Original Guaranteed</span>
@@ -945,7 +945,7 @@ function renderBrandPage(categoryName, brandName) {
           ? brandProducts.map(productCard).join('') 
           : `
             <div class="empty-state" style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; background: #fff; border-radius: 12px; border: 1px dashed #ded5c8;">
-              <p style="font-size: 16px; color: #666; margin-bottom: 16px;">Abhi ${brandName} me is category ke products available nahi hain.</p>
+              <p style="font-size: 16px; color: #666; margin-bottom: 16px;">No products are currently available from ${brandName} in this category.</p>
               <a class="button" href="/category/${slugify(categoryName)}" data-nav-category="${categoryName}">Browse other ${categoryName} brands <span>→</span></a>
             </div>
           `}
@@ -1066,7 +1066,7 @@ function renderProductPage(productId) {
           <div class="product-description-tabs">
             <h3>Product Overview</h3>
             <p>${product.description || 'A considered beauty essential, selected for your everyday ritual. Carefully formulated to deliver visible elegance and long-lasting care.'}</p>
-            <a class="whatsapp-consult-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Salam! I have a question about ${product.name} (Rs. ${product.price}).`)}" target="_blank" rel="noopener noreferrer">
+            <a class="whatsapp-consult-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello! I have a question about ${product.name} (Rs. ${product.price}).`)}" target="_blank" rel="noopener noreferrer">
               <span>Have a question? Chat on WhatsApp</span>
               <span>💬</span>
             </a>
@@ -1118,22 +1118,22 @@ function renderAboutPage() {
         <div class="about-pillar-card">
           <div class="about-pillar-icon">✨</div>
           <h3>100% Genuine & Authentic</h3>
-          <p>Hamara sab se pehla usool authenticity hai. Hum sirf direct brand partners aur verified distributors se sourcing karte hain. Zero replicas, guaranteed original products.</p>
+          <p>Our foremost principle is authenticity. We source exclusively from direct brand partners and verified distributors. Zero replicas — guaranteed original products.</p>
         </div>
         <div class="about-pillar-card">
           <div class="about-pillar-icon">🌿</div>
           <h3>Curated For Every Ritual</h3>
-          <p>Har formula ko Pakistani climate aur skin tones ke mutabiq thoughtfully choose kiya gaya hai taake aapko radiance aur care dono hasil hon.</p>
+          <p>Every formula is thoughtfully chosen for the Pakistani climate and diverse skin tones, so you get both radiance and genuine care.</p>
         </div>
         <div class="about-pillar-card">
           <div class="about-pillar-icon">🛡️</div>
           <h3>Customer Trust & Transparency</h3>
-          <p>Cash on Delivery, delivery ke waqt parcel verification, aur 7-day hassle-free return & exchange policy ke sath pure peace of mind.</p>
+          <p>Cash on Delivery, parcel inspection at delivery, and a 7-day hassle-free return & exchange policy — complete peace of mind.</p>
         </div>
         <div class="about-pillar-card">
           <div class="about-pillar-icon">🚚</div>
           <h3>Rapid Nationwide Delivery</h3>
-          <p>Lahore, Karachi, Islamabad se le kar har chhotay bare sheher tak fast 2-4 working days ke andar free delivery aapke ghar ke darwaze tak.</p>
+          <p>From Lahore, Karachi, and Islamabad to every city across Pakistan — fast free delivery in 2–4 working days, right to your doorstep.</p>
         </div>
       </div>
 
@@ -1167,19 +1167,19 @@ function renderFaqsPage() {
       </div>
 
       <div class="page-lead-card">
-        <p>Order karne, payment methods, delivery timelines aur returns se mutalliq aksar pooche jane wale sawalat ke asaan aur wazeh jawabat:</p>
+        <p>Clear answers to the most frequently asked questions about placing orders, payment methods, delivery timelines, and returns:</p>
       </div>
 
       <div class="faq-accordion-container">
         <!-- Q1 -->
         <div class="faq-item-card open">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Order kaise place karein?</span>
+            <span class="faq-question-text">How do I place an order?</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Website par kisi bhi pasandeeda product par click karein aur <strong>"Add to Bag"</strong> ya <strong>"Buy Now"</strong> select karein. Phir Shopping Bag open karke <strong>"Secure Checkout"</strong> par click karein. Apna Name, WhatsApp/Mobile number aur Delivery Address enter karein aur <strong>"Confirm Order"</strong> daba dein. Aapka order foran confirm ho jayega!
+              Click on any product you love and select <strong>"Add to Bag"</strong> or <strong>"Buy Now"</strong>. Then open your Shopping Bag and click <strong>"Secure Checkout"</strong>. Enter your Name, WhatsApp/Mobile number and Delivery Address, then press <strong>"Confirm Order"</strong>. Your order will be confirmed instantly!
             </div>
           </div>
         </div>
@@ -1187,12 +1187,12 @@ function renderFaqsPage() {
         <!-- Q2 -->
         <div class="faq-item-card">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Payment methods kya hain? (COD, EasyPaisa, JazzCash)</span>
+            <span class="faq-question-text">What payment methods are available? (COD, EasyPaisa, JazzCash)</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Hum poore Pakistan mein <strong>Cash on Delivery (COD)</strong> offer karte hain — parcel receive karne ke baad rider ko cash payment karein. Iske ilawa <strong>EasyPaisa</strong> aur <strong>JazzCash</strong> digital transfer ke zariye bhi aasaani se payment ki ja sakti hai.
+              We offer <strong>Cash on Delivery (COD)</strong> across all of Pakistan — simply pay the rider in cash when your parcel arrives. You can also pay conveniently via <strong>EasyPaisa</strong> or <strong>JazzCash</strong> digital transfer.
             </div>
           </div>
         </div>
@@ -1200,12 +1200,12 @@ function renderFaqsPage() {
         <!-- Q3 -->
         <div class="faq-item-card">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Delivery mein kitna time lagta hai?</span>
+            <span class="faq-question-text">How long does delivery take?</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Order confirm hone ke baad <strong>2 se 4 working days</strong> ke andar delivery ho jati hai. Major cities (Lahore, Karachi, Islamabad, Rawalpindi) mein aksar 2-3 din ke andar parcel delivered ho jata hai.
+              Once your order is confirmed, delivery takes <strong>2 to 4 working days</strong>. For major cities (Lahore, Karachi, Islamabad, Rawalpindi) parcels are typically delivered within 2–3 days.
             </div>
           </div>
         </div>
@@ -1213,12 +1213,12 @@ function renderFaqsPage() {
         <!-- Q4 -->
         <div class="faq-item-card">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Agar product damaged ya wrong aaye to Return kaise karein?</span>
+            <span class="faq-question-text">What if I receive a damaged or wrong product? How do I return it?</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Classic Cosmetics <strong>7 din ki aasaan return aur exchange policy</strong> provide karta hai. Agar product damaged, leaked ya wrong dispatch hua ho to product ke sath mojood return slip ke sath hamare WhatsApp (+92 322 2495034) par photo/video share karein. Hamari team foran replacement unit ya refund arrange karegi bina kisi extra shipping charges ke.
+              Classic Cosmetics offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+92 322 2495034). Our team will immediately arrange a replacement or refund at no extra shipping cost.
             </div>
           </div>
         </div>
@@ -1226,12 +1226,12 @@ function renderFaqsPage() {
         <!-- Q5 -->
         <div class="faq-item-card">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Kya sabhi products 100% authentic aur original hain?</span>
+            <span class="faq-question-text">Are all products 100% authentic and original?</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Ji bilkul 100%! Classic Cosmetics par har product 100% authentic aur original brand stock hota hai. Hum direct authorized brand distributors aur brand partners se stock procure karte hain. Har product original packaging aur verifiable batch codes ke sath deliver hota hai.
+              Absolutely 100%! Every product on Classic Cosmetics is 100% authentic and original brand stock. We procure directly from authorized brand distributors and brand partners. Every product is delivered in its original packaging with verifiable batch codes.
             </div>
           </div>
         </div>
@@ -1239,12 +1239,12 @@ function renderFaqsPage() {
         <!-- Q6 -->
         <div class="faq-item-card">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Delivery charges kitne hain?</span>
+            <span class="faq-question-text">What are the delivery charges?</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Classic Cosmetics par sabhi orders par delivery <strong>bilkul FREE</strong> hai nationwide! Aapko koi additional delivery charges ada nahi karne partay.
+              Delivery on all Classic Cosmetics orders is <strong>completely FREE</strong> nationwide! You do not need to pay any additional delivery charges.
             </div>
           </div>
         </div>
@@ -1252,12 +1252,12 @@ function renderFaqsPage() {
         <!-- Q7 -->
         <div class="faq-item-card">
           <button class="faq-question-btn" type="button">
-            <span class="faq-question-text">Apna order kaise track karein?</span>
+            <span class="faq-question-text">How can I track my order?</span>
             <span class="faq-icon-symbol">+</span>
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Aap website footer mein mojood <a href="/track-order" data-nav-page="/track-order" style="color:var(--gold); font-weight:600;">Track Your Order</a> page par ja kar apna Order ID ya phone number darj karke live status check kar sakte hain, ya direct hamare WhatsApp helpline par rabta kar sakte hain.
+              Visit the <a href="/track-order" data-nav-page="/track-order" style="color:var(--gold); font-weight:600;">Track Your Order</a> page in the website footer, enter your Order ID or phone number to check your live status — or contact our WhatsApp helpline directly.
             </div>
           </div>
         </div>
@@ -1265,9 +1265,9 @@ function renderFaqsPage() {
 
       <!-- WhatsApp Help CTA -->
       <div style="margin-top: 36px; text-align: center; padding: 24px; background: #fdf5e6; border: 1px solid #ebdcc5; border-radius: 12px;">
-        <h4 style="margin: 0 0 8px; font-size: 16px;">Koi aur sawal hai? Hamare sath live chat karein!</h4>
-        <p style="color: #666; font-size: 13px; margin: 0 0 16px;">Hamari customer care team subah 10 baje se raat 10 baje tak active rehti hai.</p>
-        <a class="button" href="https://wa.me/923222495034?text=Salam!%20Mujhe%20ek%20sawal%20poochna%20hai" target="_blank" rel="noopener noreferrer">
+        <h4 style="margin: 0 0 8px; font-size: 16px;">Have another question? Chat with us live!</h4>
+        <p style="color: #666; font-size: 13px; margin: 0 0 16px;">Our customer care team is available daily from 10 AM to 10 PM.</p>
+        <a class="button" href="https://wa.me/923222495034?text=Hello!%20I%20have%20a%20question" target="_blank" rel="noopener noreferrer">
           Chat on WhatsApp (+92 322 2495034) <span>💬</span>
         </a>
       </div>
@@ -1297,7 +1297,7 @@ function renderDeliveryReturnsPage() {
 
       <div class="page-lead-card">
         <p>
-          Classic Cosmetics par hamara maqsad aap tak 100% authentic cosmetics be-had aasani aur tezi ke sath pohanchana hai. Hum transparency aur customer satisfaction ko first priority dete hain.
+          Our goal at Classic Cosmetics is to deliver 100% authentic cosmetics to your door quickly and effortlessly. We place transparency and customer satisfaction as our top priority.
         </p>
       </div>
 
@@ -1307,17 +1307,17 @@ function renderDeliveryReturnsPage() {
         <div class="step-card">
           <span class="step-number">1</span>
           <h4>Order Confirmation</h4>
-          <p>Jaise hi aap order submit karte hain, hamari dispatch team details confirm karke parcel pack karti hai.</p>
+          <p>As soon as you submit your order, our dispatch team confirms the details and packs your parcel.</p>
         </div>
         <div class="step-card">
           <span class="step-number">2</span>
           <h4>2 - 4 Working Days</h4>
-          <p>Order confirm hone ke 2-3 se 4 working days ke andar delivery rider aapke address par parcel deliver karta hai.</p>
+          <p>Within 2 to 4 working days of order confirmation, our delivery rider brings your parcel to your address.</p>
         </div>
         <div class="step-card">
           <span class="step-number">3</span>
           <h4>Cash on Delivery</h4>
-          <p>Parcel haath mein lene par tasalli se cash rider ko ada karein. Free delivery nationwide across Pakistan.</p>
+          <p>Receive your parcel, inspect it comfortably, then pay the rider in cash. Free delivery nationwide across Pakistan.</p>
         </div>
       </div>
 
@@ -1326,19 +1326,19 @@ function renderDeliveryReturnsPage() {
       <div style="background:#fff; border: 1px solid #ebdcc5; border-radius: 12px; padding: 26px 24px; line-height: 1.7; font-size: 14px; color:#444;">
         <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px;">
           <li>
-            <strong>7 Days Return & Exchange Window:</strong> Agar product transit mein damaged ho gaya ho, leak hua ho, ya galat product deliver ho gaya ho, to aap delivery ke 7 din ke andar return ya exchange request submit kar sakte hain.
+            <strong>7 Days Return & Exchange Window:</strong> If your product was damaged in transit, leaked, or the wrong item was delivered, you may submit a return or exchange request within 7 days of delivery.
           </li>
           <li>
-            <strong>Return Slip Requirement:</strong> Har delivered order ke parcel mein delivery/return slip mojood hoti hai. Product ko return slip aur original brand packaging ke sath handover kiya ja sakta hai.
+            <strong>Return Slip Requirement:</strong> Every delivered parcel includes a delivery/return slip. The product must be returned with the slip and its original brand packaging.
           </li>
           <li>
-            <strong>Product Exchange Available:</strong> Agar aap same product ka replacement ya kisi doosri variant/shade ka exchange chahte hain, to hamari team defined period (7 din) ke andar prompt exchange arrange karegi.
+            <strong>Product Exchange Available:</strong> If you'd like a replacement of the same product or an exchange for a different variant/shade, our team will arrange a prompt exchange within the 7-day window.
           </li>
           <li>
-            <strong>Zero Extra Shipping Charges:</strong> Agar damage ya galat product hamari taraf se dispatch hua ho, to customer ko koi shipping fee ada nahi karni hogi. Hum free pickup aur replacement provide karte hain.
+            <strong>Zero Extra Shipping Charges:</strong> If a damaged or incorrect product was dispatched from our side, the customer pays no shipping fee. We provide free pickup and replacement.
           </li>
           <li>
-            <strong>Refund Method:</strong> Product inspect hone ke baad refund amount aapke EasyPaisa, JazzCash ya Bank Account mein 24-48 ghanton ke andar transfer kar di jati hai.
+            <strong>Refund Method:</strong> After inspection, the refund amount is transferred to your EasyPaisa, JazzCash, or Bank Account within 24–48 hours.
           </li>
         </ul>
       </div>
@@ -1346,7 +1346,7 @@ function renderDeliveryReturnsPage() {
       <div class="policy-callout-box">
         <span style="font-size:24px;">🛡️</span>
         <p>
-          <strong>Hassle-Free Guarantee:</strong> Return ya exchange start karne ke liye sirf hamare WhatsApp Helpline <strong>+92 322 2495034</strong> par order slip aur product ki photo send karein. Hamari team foran process shuru kar degi.
+          <strong>Hassle-Free Guarantee:</strong> To initiate a return or exchange, simply send the order slip and a photo of the product to our WhatsApp Helpline <strong>+92 322 2495034</strong>. Our team will begin the process immediately.
         </p>
       </div>
     </div>
@@ -1374,14 +1374,14 @@ function renderTrackOrderPage() {
       </div>
 
       <div class="track-order-card">
-        <p style="color:#555; font-size:14px; margin:0 0 10px;">Apna Order ID (e.g. CC-10492) ya Checkout par diya gaya WhatsApp Phone Number enter karein:</p>
+        <p style="color:#555; font-size:14px; margin:0 0 10px;">Enter your Order ID (e.g. CC-10492) or the WhatsApp/Phone Number you provided at checkout:</p>
         <div class="track-input-group">
-          <input type="text" id="track-query-input" placeholder="e.g. CC-1082 ya 0300-1234567" aria-label="Order ID or Phone Number" />
+          <input type="text" id="track-query-input" placeholder="e.g. CC-1082 or 0300-1234567" aria-label="Order ID or Phone Number" />
           <button type="button" id="track-submit-btn">Track Order</button>
         </div>
         <div id="track-result-container">
           <div style="text-align:center; padding: 20px 0; color:#888; font-size:13px;">
-            Order status dekhne ke liye upar apna number ya order number likh kar <b>Track Order</b> dabayein.
+            Enter your order number or phone number above and click <b>Track Order</b> to see your order status.
           </div>
         </div>
       </div>
@@ -1389,8 +1389,8 @@ function renderTrackOrderPage() {
       <div style="margin-top: 36px; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
         <div style="background:#fff; border:1px solid #eee7dd; border-radius:10px; padding:20px; text-align:center;">
           <h4 style="margin:0 0 6px; font-size:15px;">Need Live Support?</h4>
-          <p style="color:#666; font-size:12.5px; margin:0 0 12px;">Hamare courier logistics team se WhatsApp par foran status updates lein.</p>
-          <a class="button" href="https://wa.me/923222495034?text=Salam!%20Mujhe%20apne%20order%20ka%20status%20track%20karna%20hai" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
+          <p style="color:#666; font-size:12.5px; margin:0 0 12px;">Get instant status updates from our courier logistics team on WhatsApp.</p>
+          <a class="button" href="https://wa.me/923222495034?text=Hello!%20I%20need%20to%20track%20my%20order%20status" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
             WhatsApp Tracker <span>💬</span>
           </a>
         </div>
@@ -2393,7 +2393,7 @@ function bindGlobalEvents() {
             <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Estimated Delivery:</strong> 2 - 4 Working Days (Free Shipping)</p>
             <div style="margin-top:16px; padding-top:12px; border-top:1px dashed #ebdcc5; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
               <span style="font-size:12px; color:#777;">Payment: <b>Cash on Delivery (COD)</b></span>
-              <a href="https://wa.me/923222495034?text=${encodeURIComponent(`Salam! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
+              <a href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
                 💬 Inquire on WhatsApp →
               </a>
             </div>

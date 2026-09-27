@@ -201,8 +201,15 @@
   }
 }
 .product-gallery-card {
-  position: sticky;
-  top: 100px;
+  position: static !important;
+  top: auto !important;
+  align-self: auto !important;
+}
+@media (max-width: 880px) {
+  .product-gallery-card {
+    position: static !important;
+    top: auto !important;
+  }
 }
 .product-main-media {
   position: relative;
