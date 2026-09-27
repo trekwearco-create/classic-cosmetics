@@ -468,7 +468,20 @@ function renderStorefrontShell(mainContentHtml) {
             <p class="eyebrow">Categories</p>
           </div>
           <nav class="mobile-menu-nav">
-            ${categories.map(cat => {
+            <a href="/#shop" data-nav-home="true" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#c6a664,#e4c98e);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="7" width="18" height="13" rx="2" ry="2"></rect>
+                  <path d="M8 7V5a4 4 0 0 1 8 0v2"></path>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>Shop All</strong>
+                <span>Browse entire collection</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+            ${(categories || []).map(cat => {
               const catIcons = {
                 'Skincare': { grad: 'linear-gradient(135deg,#f8c8dc,#f4a8c0)', icon: 'M12 2a6 6 0 0 1 6 6c0 2-2 3-2 5s1 2 1 3a3 3 0 0 1-6 0c0-1 1-2 1-3s-2-3-2-5a6 6 0 0 1 6-6z' },
                 'Makeup': { grad: 'linear-gradient(135deg,#f5d76e,#f0932b)', icon: 'M12 19l7-7 3 3-7 7-3-3zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5zM2 2l7.586 7.586M11 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' },
@@ -485,7 +498,7 @@ function renderStorefrontShell(mainContentHtml) {
                   </span>
                   <div class="mobile-menu-text">
                     <strong>${cat}</strong>
-                    <span>Shop ${cat.toLowerCase()} collection</span>
+                    <span>Shop ${String(cat || '').toLowerCase()} collection</span>
                   </div>
                   <span class="mobile-menu-arrow">›</span>
                 </a>
@@ -1796,7 +1809,13 @@ function renderAdminViewContent() {
               <label>Cut Price (Rs.)<input name="originalPrice" type="number" min="0" placeholder="3890"/></label>
             </div>
             <label>Shade / Variant<input name="shade" placeholder="e.g. Natural Sand, 50ml"/></label>
-            <label>Image URL<input name="imageUrl" placeholder="https://images.unsplash.com/... or paste image link"/></label>
+            <label>Product Image
+              <input name="imageFile" type="file" accept="image/*" capture="environment"/>
+            </label>
+            <div class="admin-image-preview" id="product-image-preview" style="display:none;margin:8px 0 14px;">
+              <img src="" alt="Product preview" style="max-height:120px;border-radius:12px;border:1px solid #e8dec9;box-shadow:0 3px 10px rgba(0,0,0,0.05);"/>
+              <small style="display:block;color:#888;margin-top:6px;font-size:11px;">Select new image above to replace. If nothing is selected, the current image will be kept.</small>
+            </div>
             <label>Details<textarea name="description" rows="3" placeholder="Describe the product ritual, benefits, and formulation..."></textarea></label>
             <button class="button" type="submit">Save product <span>→</span></button>
           </form>
@@ -1863,6 +1882,13 @@ function renderAdminViewContent() {
             <label>Brand Name
               <input name="name" required placeholder="e.g. Garnier, Nivea, CeraVe"/>
             </label>
+            <label>Brand Logo (Optional)
+              <input name="brandLogo" type="file" accept="image/*" capture="environment"/>
+            </label>
+            <div class="admin-image-preview" id="brand-logo-preview" style="display:none;margin:8px 0 14px;">
+              <img src="" alt="Brand logo preview" style="max-height:90px;max-width:220px;object-fit:contain;border-radius:12px;border:1px solid #e8dec9;padding:8px;background:#fff;"/>
+              <small style="display:block;color:#888;margin-top:6px;font-size:11px;">Square or wide logos work best. Will appear on the homepage brand cards and brand page.</small>
+            </div>
             <button class="button" type="submit">Add brand <span>→</span></button>
           </form>
         </article>
@@ -1873,7 +1899,10 @@ function renderAdminViewContent() {
           <div class="manager-list">
             ${brands.length ? brands.map((b, idx) => `
               <div>
-                <span><strong>${b.name}</strong><small>${b.category}</small></span>
+                <span>
+                  ${b.logo ? `<img src="${b.logo}" alt="${b.name}" style="width:38px;height:38px;object-fit:contain;margin-right:10px;border-radius:8px;border:1px solid #eee;background:#fff;padding:3px;"/>` : ''}
+                  <strong>${b.name}</strong><small>${b.category}</small>
+                </span>
                 <span>
                   <button data-rename-brand="${idx}">Rename</button>
                   <button data-delete-brand="${idx}" style="color:#d9534f;">Delete</button>
@@ -2067,6 +2096,57 @@ function attachAdminDynamicForms() {
       showToast('Orders refreshed.');
     };
   }
+
+  // Upload image to Supabase storage (or base64 fallback)
+  async function uploadImageFile(file, bucketName = 'product-images') {
+    if (!file || !file.size) return null;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image is too large (max 5MB). Compress and try again.');
+      return null;
+    }
+    if (supabaseConfigured) {
+      try {
+        const ext = (file.name || '').split('.').pop()?.toLowerCase() || 'png';
+        const safeName = `${crypto.randomUUID()}.${ext}`;
+        const path = `${safeName}`;
+        const { error: uploadErr } = await supabase.storage.from(bucketName).upload(path, file, { upsert: true, contentType: file.type });
+        if (!uploadErr) {
+          const { data } = supabase.storage.from(bucketName).getPublicUrl(path);
+          if (data?.publicUrl) return data.publicUrl;
+        } else {
+          console.warn('Supabase storage upload failed, falling back to local embed:', uploadErr);
+          showToast('Supabase storage unavailable — image saved locally embedded.');
+        }
+      } catch (err) {
+        console.warn('Storage upload error, falling back to base64:', err);
+      }
+    }
+    return await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setupImagePreview(inputSelector, previewSelector, imageAttr = 'src') {
+    const input = document.querySelector(inputSelector);
+    const previewWrap = document.querySelector(previewSelector);
+    if (!input || !previewWrap) return;
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      const img = previewWrap.querySelector('img');
+      if (!file || !img) { previewWrap.style.display = 'none'; return; }
+      const reader = new FileReader();
+      reader.onload = () => { img.setAttribute(imageAttr, reader.result); previewWrap.style.display = 'block'; };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Product image file preview
+  setupImagePreview('#product-admin-form input[name="imageFile"]', '#product-image-preview');
+  // Brand logo file preview
+  setupImagePreview('#brand-admin-form input[name="brandLogo"]', '#brand-logo-preview');
 
   // Section Type Selector Toggle
   const secTypeSelect = document.querySelector('#section-type-select');
