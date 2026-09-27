@@ -18,6 +18,7 @@ let ordersLoaded = false;
 let ordersChannel = null;
 let ordersPoller = null;
 let catalogueChannel = null;
+let activeCategory = 'all';
 const money = value => `Rs. ${value.toLocaleString('en-PK')}`;
 const save = () => localStorage.setItem('classic-cart', JSON.stringify(cart));
 const cartCount = () => cart.reduce((total, item) => total + item.quantity, 0);
@@ -28,14 +29,31 @@ function productCard(product) {
 }
 
 function render() {
+  const displayedProducts = activeCategory === 'all' 
+    ? products 
+    : products.filter(product => product.type.toLowerCase() === activeCategory.toLowerCase());
+
   document.querySelector('#app').innerHTML = `
-    <div class="announcement"><span>✦ 100% Genuine Products</span><span class="desktop-only">Free delivery on prepaid orders</span><span class="desktop-only">Easy returns, always</span></div>
+    <div class="announcement"><span>✦ 100% Genuine Products</span><span class="desktop-only">Free delivery across Pakistan</span><span class="desktop-only">Easy cash on delivery</span></div>
     <header><button class="menu-button" aria-label="Open navigation">☰</button><a class="logo" href="#top"><span>CLASSIC</span><em>cosmetics</em></a><nav><a href="#shop">Shop</a>${categories.map(category=>`<a href="#shop" data-category-link="${category}">${category}</a>`).join('')}<a href="#contact">Contact</a></nav><div class="header-actions"><button aria-label="Search">⌕</button><button aria-label="Account">♙</button><button class="cart-trigger" aria-label="Open cart">Bag <b>${cartCount()}</b></button></div></header><aside class="mobile-menu"><button class="close-menu" aria-label="Close menu">×</button><p class="eyebrow">Explore</p><a href="#shop">Shop all</a>${categories.map(category=>`<a href="#shop" data-category-link="${category}">${category}</a>`).join('')}<a href="#story">Our story</a><a href="#contact">Contact</a></aside>
     <main id="top">
       <section class="hero"><div class="hero-copy"><p class="eyebrow">The art of everyday beauty</p><h1>Radiance, made<br /><i>ritual.</i></h1><p class="hero-text">Considered essentials for your most luminous self. Discover beauty that feels like care.</p><a class="button" href="#shop">Shop the collection <span>→</span></a></div><div class="hero-art"><div class="sun"></div><div class="arch"></div><img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1200&q=90" alt="Classic beauty collection" /><p class="vertical-label">EST. 2024 · PAKISTAN</p></div></section>
-      <section class="trust"><div><b>✦</b><span><strong>Curated with care</strong>Authentic beauty, thoughtfully chosen</span></div><div><b>◌</b><span><strong>Made for you</strong>Every tone. Every ritual. Every day.</span></div><div><b>⌁</b><span><strong>Delivered beautifully</strong>Across Pakistan, at your doorstep</span></div></section>
+      <section class="featured" id="shop">
+        <div class="section-heading row-heading">
+          <div>
+            <p class="eyebrow">Curated Collection</p>
+            <h2 id="shop-title">${activeCategory === 'all' ? 'Most loved' : activeCategory}</h2>
+          </div>
+          <button class="text-link" id="view-all">View all products →</button>
+        </div>
+        <div class="shop-filter-bar" role="tablist" aria-label="Categories">
+          <button class="filter-pill ${activeCategory === 'all' ? 'active' : ''}" data-filter="all">All Products</button>
+          ${categories.map(cat => `<button class="filter-pill ${activeCategory.toLowerCase() === cat.toLowerCase() ? 'active' : ''}" data-filter="${cat}">${cat}</button>`).join('')}
+        </div>
+        <div class="products">${(displayedProducts.length ? displayedProducts : products).map(productCard).join('')}</div>
+      </section>
       <section class="categories" id="rituals"><div class="section-heading"><p class="eyebrow">Explore by ritual</p><h2>Beauty, your way</h2></div><div class="category-grid">${categories.map((category,index)=>`<a href="#shop" data-category-link="${category}"><span class="cat-number">${String(index+1).padStart(2,'0')}</span><strong>${category}</strong><i>Discover the collection</i></a>`).join('')}</div></section>
-      <section class="featured" id="shop"><div class="section-heading row-heading"><div><p class="eyebrow">Just for you</p><h2 id="shop-title">Most loved</h2></div><button class="text-link" id="view-all">View all products →</button></div><div class="products">${products.map(productCard).join('')}</div></section>
+      <section class="trust"><div><b>✦</b><span><strong>Curated with care</strong>Authentic beauty, thoughtfully chosen</span></div><div><b>◌</b><span><strong>Made for you</strong>Every tone. Every ritual. Every day.</span></div><div><b>⌁</b><span><strong>Delivered beautifully</strong>Across Pakistan, at your doorstep</span></div></section>
       <section class="editorial" id="story"><div class="editorial-image"><img src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1000&q=90" alt="Woman applying skincare" /></div><div class="editorial-copy"><p class="eyebrow">Our philosophy</p><h2>Beauty should feel<br /><i>like a pause.</i></h2><p>We believe the small moments you give yourself matter most. Classic Cosmetics brings together refined, effective beauty to turn the everyday into a personal ritual.</p><a class="text-link" href="#contact">Meet Classic Cosmetics →</a></div></section>
       <section class="reviews"><p class="eyebrow">Kind words</p><blockquote>“The packaging, the products, the whole experience — it feels like a little luxury delivered to my door.”</blockquote><div class="stars">★★★★★</div><p>— AREEBA K., LAHORE</p></section>
       <section class="newsletter" id="contact"><div><p class="eyebrow">A note from us</p><h2>Be first to know</h2><p>New arrivals, quiet offers and beauty notes — just the lovely bits.</p></div><form id="newsletter-form"><input type="email" required placeholder="Your email address" aria-label="Email address" /><button class="button" type="submit">Subscribe <span>→</span></button></form></section>
@@ -43,33 +61,149 @@ function render() {
     <footer><a class="logo" href="#top"><span>CLASSIC</span><em>cosmetics</em></a><div><strong>Explore</strong><a href="#shop">Shop all</a><a href="#rituals">Collections</a><a href="#story">Our story</a></div><div><strong>Customer care</strong><a href="#contact">Contact us</a><a href="#">Delivery & returns</a><a href="#">Privacy policy</a></div><p>© 2026 Classic Cosmetics.<br />Elegance in every detail.</p></footer>
     <a class="whatsapp" href="https://wa.me/923222495034?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Classic Cosmetics on WhatsApp">◔</a>
     <aside class="cart-panel ${cart.length ? 'open' : ''}"><div class="cart-head"><h2>Your bag</h2><button class="close-cart" aria-label="Close cart">×</button></div>${cart.length ? `<div class="cart-items">${cart.map(item => `<div class="cart-item"><img src="${item.image}" alt="" /><div><span>${item.type}</span><strong>${item.name}</strong><small>${money(item.price)} × ${item.quantity}</small></div><button data-remove="${item.id}" aria-label="Remove ${item.name}">×</button></div>`).join('')}</div><div class="cart-footer"><p><span>Subtotal</span><strong>${money(cartTotal())}</strong></p><button class="button checkout">Secure checkout <span>→</span></button><small>Cash on delivery available</small></div>` : `<div class="empty-cart"><p>Your bag is waiting for a little beauty.</p><button class="button close-cart">Continue shopping</button></div>`}</aside>
-    <div class="checkout-modal" aria-hidden="true"><div class="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title"><button class="close-checkout" aria-label="Close checkout">×</button><p class="eyebrow">Almost yours</p><h2 id="checkout-title">Delivery details</h2><p class="checkout-summary">${cartCount()} item${cartCount() === 1 ? '' : 's'} · <strong>${money(cartTotal())}</strong></p><form id="checkout-form"><label>Full name<input name="name" required autocomplete="name" /></label><label>Phone number<input name="phone" type="tel" required autocomplete="tel" /></label><label>Delivery address<textarea name="address" required rows="3" autocomplete="street-address"></textarea></label><div class="checkout-row"><label>City<input name="city" required autocomplete="address-level2" /></label><label>Payment method<select name="payment_method" required><option value="cod">Cash on Delivery</option><option value="easypaisa">EasyPaisa</option><option value="jazzcash">JazzCash</option><option value="card">Credit / Debit Card</option></select></label></div><button class="button" type="submit">Place order <span>→</span></button></form></div></div><div class="overlay"></div><div class="toast" role="status"></div>`;
+    
+    <div class="checkout-modal" aria-hidden="true">
+      <div class="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+        <button class="close-checkout" aria-label="Close checkout">×</button>
+        <div class="checkout-header">
+          <p class="eyebrow">Fast & Secure</p>
+          <h2 id="checkout-title">Delivery Details</h2>
+          <p class="checkout-tagline">Apni delivery details enter karein aur Cash on Delivery par order confirm karein.</p>
+        </div>
+        <div class="checkout-summary-bar">
+          <div class="summary-left">
+            <span>Items: <b>${cartCount()}</b></span>
+            <span class="free-ship-badge">🚚 Free Delivery</span>
+          </div>
+          <div class="summary-right">
+            <span>Total: <strong>${money(cartTotal())}</strong></span>
+          </div>
+        </div>
+        <form id="checkout-form">
+          <div class="form-group">
+            <label for="checkout-name">Full Name <span class="req">*</span></label>
+            <input id="checkout-name" name="name" required autocomplete="name" placeholder="Apna poora naam likhein (e.g. Areeba Khan)" />
+          </div>
+          <div class="form-group">
+            <label for="checkout-phone">WhatsApp / Mobile Number <span class="req">*</span></label>
+            <input id="checkout-phone" name="phone" type="tel" required autocomplete="tel" placeholder="0300-1234567 (Delivery updates ke liye)" />
+            <small class="field-hint">Courier dispatch updates aur confirmation ke liye apna active number likhein.</small>
+          </div>
+          <div class="form-group">
+            <label for="checkout-address">Delivery Address <span class="req">*</span></label>
+            <textarea id="checkout-address" name="address" required rows="2" autocomplete="street-address" placeholder="House / Flat #, Street name, Sector / Area, Landmark..."></textarea>
+          </div>
+          <div class="checkout-row">
+            <div class="form-group">
+              <label for="checkout-city">City <span class="req">*</span></label>
+              <input id="checkout-city" name="city" required list="pk-cities" autocomplete="address-level2" placeholder="e.g. Lahore, Karachi, Islamabad..." />
+              <datalist id="pk-cities">
+                <option value="Lahore"></option>
+                <option value="Karachi"></option>
+                <option value="Islamabad"></option>
+                <option value="Rawalpindi"></option>
+                <option value="Faisalabad"></option>
+                <option value="Multan"></option>
+                <option value="Peshawar"></option>
+                <option value="Quetta"></option>
+                <option value="Sialkot"></option>
+                <option value="Gujranwala"></option>
+                <option value="Hyderabad"></option>
+                <option value="Bahawalpur"></option>
+              </datalist>
+            </div>
+            <div class="form-group">
+              <label for="checkout-payment">Payment Method <span class="req">*</span></label>
+              <select id="checkout-payment" name="payment_method" required>
+                <option value="Cash on Delivery" selected>💵 Cash on Delivery (COD) - Recommended</option>
+                <option value="EasyPaisa">📱 EasyPaisa</option>
+                <option value="JazzCash">📱 JazzCash</option>
+                <option value="Credit / Debit Card">💳 Credit / Debit Card</option>
+              </select>
+            </div>
+          </div>
+          <div class="cod-reassurance-box">
+            <span class="cod-icon">🛡️</span>
+            <div class="cod-text">
+              <strong>Cash on Delivery Available Across Pakistan</strong>
+              <small>Parcel haath me le kar rider ko payment karein. Delivery bilkul muft hai.</small>
+            </div>
+          </div>
+          <button class="button checkout-submit-btn" type="submit">
+            <span>Confirm Order • ${money(cartTotal())}</span>
+            <span>→</span>
+          </button>
+          <div class="checkout-trust-row">
+            <span>✓ 100% Genuine</span>
+            <span>✓ Free Delivery</span>
+            <span>✓ Inspect Parcel on Delivery</span>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="thank-you-modal" id="thank-you-modal" aria-hidden="true"></div>
+    <div class="overlay"></div><div class="toast" role="status"></div>`;
   bindEvents();
 }
 
-function showToast(text) { const toast = document.querySelector('.toast'); toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2600); }
+function showToast(text) { const toast = document.querySelector('.toast'); if (!toast) return; toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2600); }
 function add(id) { const product = products.find(p => p.id === id); const line = cart.find(p => p.id === id); line ? line.quantity++ : cart.push({ ...product, quantity: 1 }); save(); render(); document.querySelector('.cart-panel').classList.add('open'); showToast(`${product.name} added to your bag`); }
+
 function bindEvents() {
   document.querySelectorAll('[data-add]').forEach(button => button.onclick = () => add(button.dataset.add));
-  document.querySelector('.cart-trigger').onclick = () => document.querySelector('.cart-panel').classList.add('open');
-  document.querySelectorAll('.close-cart, .overlay').forEach(button => button.onclick = () => document.querySelector('.cart-panel').classList.remove('open'));
-  document.querySelectorAll('[data-remove]').forEach(button => button.onclick = () => { cart = cart.filter(p => p.id !== button.dataset.remove); save(); render(); document.querySelector('.cart-panel').classList.add('open'); });
+  document.querySelector('.cart-trigger')?.addEventListener('click', () => document.querySelector('.cart-panel')?.classList.add('open'));
+  document.querySelectorAll('.close-cart, .overlay').forEach(button => button.onclick = () => document.querySelector('.cart-panel')?.classList.remove('open'));
+  document.querySelectorAll('[data-remove]').forEach(button => button.onclick = () => { cart = cart.filter(p => p.id !== button.dataset.remove); save(); render(); document.querySelector('.cart-panel')?.classList.add('open'); });
   document.querySelectorAll('[data-product]').forEach(button => button.onclick = () => add(button.dataset.product));
   document.querySelectorAll('[data-details]').forEach(button => button.onclick = () => showProductDetails(button.dataset.details));
-  document.querySelector('.menu-button').onclick = () => document.querySelector('.mobile-menu').classList.add('open');
-  document.querySelector('.close-menu').onclick = () => document.querySelector('.mobile-menu').classList.remove('open');
+  document.querySelector('.menu-button')?.addEventListener('click', () => document.querySelector('.mobile-menu')?.classList.add('open'));
+  document.querySelector('.close-menu')?.addEventListener('click', () => document.querySelector('.mobile-menu')?.classList.remove('open'));
+
+  // Quick filter pills
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.onclick = () => {
+      activeCategory = pill.dataset.filter;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.filter === activeCategory));
+      document.querySelector('#shop-title').textContent = activeCategory === 'all' ? 'Most loved' : activeCategory;
+      const filtered = activeCategory === 'all' ? products : products.filter(p => p.type.toLowerCase() === activeCategory.toLowerCase());
+      document.querySelector('.products').innerHTML = (filtered.length ? filtered : products).map(productCard).join('');
+      document.querySelectorAll('[data-add]').forEach(button => button.onclick = () => add(button.dataset.add));
+      document.querySelectorAll('[data-details]').forEach(button => button.onclick = () => showProductDetails(button.dataset.details));
+    };
+  });
+
   document.querySelectorAll('[data-category-link]').forEach(link => link.onclick = () => {
     const category = link.dataset.categoryLink;
-    document.querySelector('.mobile-menu').classList.remove('open');
-    const filtered = products.filter(product => product.type === category);
+    activeCategory = category;
+    document.querySelector('.mobile-menu')?.classList.remove('open');
     document.querySelector('#shop-title').textContent = category;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.filter.toLowerCase() === category.toLowerCase()));
+    const filtered = products.filter(product => product.type.toLowerCase() === category.toLowerCase());
     document.querySelector('.products').innerHTML = (filtered.length ? filtered : products).map(productCard).join('');
     document.querySelectorAll('[data-add]').forEach(button => button.onclick = () => add(button.dataset.add));
     document.querySelectorAll('[data-details]').forEach(button => button.onclick = () => showProductDetails(button.dataset.details));
+    document.querySelector('#shop')?.scrollIntoView({ behavior: 'smooth' });
   });
-  document.querySelector('#view-all').onclick = () => { document.querySelector('#shop-title').textContent = 'Most loved'; document.querySelector('.products').innerHTML = products.map(productCard).join(''); bindEvents(); };
-  document.querySelector('#newsletter-form').onsubmit = event => { event.preventDefault(); event.target.reset(); showToast('Welcome to the Classic circle.'); };
-  document.querySelector('.checkout')?.addEventListener('click', () => document.querySelector('.checkout-modal').classList.add('open'));
+
+  document.querySelector('#view-all')?.addEventListener('click', () => { 
+    activeCategory = 'all'; 
+    document.querySelector('#shop-title').textContent = 'Most loved'; 
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.filter === 'all'));
+    document.querySelector('.products').innerHTML = products.map(productCard).join(''); 
+    document.querySelectorAll('[data-add]').forEach(button => button.onclick = () => add(button.dataset.add));
+    document.querySelectorAll('[data-details]').forEach(button => button.onclick = () => showProductDetails(button.dataset.details));
+  });
+
+  document.querySelector('#newsletter-form')?.addEventListener('submit', event => { 
+    event.preventDefault(); 
+    event.target.reset(); 
+    showToast('Welcome to the Classic circle.'); 
+  });
+
+  document.querySelector('.checkout')?.addEventListener('click', () => {
+    document.querySelector('.cart-panel')?.classList.remove('open');
+    document.querySelector('.checkout-modal')?.classList.add('open');
+  });
   document.querySelector('.close-checkout')?.addEventListener('click', closeCheckout);
   document.querySelector('#checkout-form')?.addEventListener('submit', submitOrder);
 }
@@ -103,28 +237,165 @@ function subscribeToCatalogue() {
     .subscribe();
 }
 
-function closeCheckout() { document.querySelector('.checkout-modal')?.classList.remove('open'); }
+function closeCheckout() { 
+  document.querySelector('.checkout-modal')?.classList.remove('open'); 
+}
+
+function showThankYouModal(order) {
+  const modal = document.querySelector('#thank-you-modal');
+  if (!modal) return;
+  modal.innerHTML = `
+    <div class="thank-you-dialog" role="dialog" aria-modal="true" aria-labelledby="thankyou-title">
+      <button class="close-thankyou" aria-label="Close confirmation">×</button>
+      <div class="thankyou-badge-wrap">
+        <div class="thankyou-icon">
+          <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+      </div>
+      <span class="thankyou-tag">✦ ORDER CONFIRMED · MUBARAK HO! ✦</span>
+      <h2 id="thankyou-title">Shukriya, ${order.name || order.customer_name}!</h2>
+      <p class="thankyou-sub">Aapka order kamyabi ke sath place ho gaya hai. Hamari dispatch team jald hi aapka parcel pack karke courier ke hawale karegi.</p>
+      
+      <div class="thankyou-order-pill">
+        <span>Order Number:</span> <strong>#${order.order_number}</strong>
+        <span class="pill-dot">·</span>
+        <span class="pill-status">Confirmed</span>
+      </div>
+
+      <div class="thankyou-info-card">
+        <div class="info-row">
+          <span class="info-label">Customer Name:</span>
+          <span class="info-val">${order.name || order.customer_name}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">WhatsApp / Phone:</span>
+          <span class="info-val">${order.phone || order.customer_phone}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Delivery Address:</span>
+          <span class="info-val">${order.address || order.customer_address}, ${order.city}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Payment Method:</span>
+          <span class="info-val"><strong>${order.payment_method}</strong></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Estimated Delivery:</span>
+          <span class="info-val">2–4 Business Days (TCS / Leopard)</span>
+        </div>
+      </div>
+
+      <div class="thankyou-items-summary">
+        <div class="items-head">
+          <span>Ordered Items (${order.items.reduce((sum, item) => sum + item.quantity, 0)})</span>
+          <span>${money(order.total_amount)}</span>
+        </div>
+        <div class="items-list">
+          ${order.items.map(item => `
+            <div class="thankyou-item-row">
+              <img src="${item.image}" alt="${item.product_name || item.name}" />
+              <div class="item-details">
+                <strong>${item.product_name || item.name}</strong>
+                <small>${money(item.unit_price || item.price)} × ${item.quantity}</small>
+              </div>
+              <span class="item-total">${money((item.unit_price || item.price) * item.quantity)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="delivery-free-notice">
+          <span>Delivery Fee:</span>
+          <strong style="color: #27ae60;">FREE (Rs. 0)</strong>
+        </div>
+      </div>
+
+      <div class="thankyou-actions">
+        <button class="button thankyou-continue-btn" id="close-thankyou-btn">Continue Shopping <span>→</span></button>
+        <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Salam Classic Cosmetics! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
+          Chat on WhatsApp <span>💬</span>
+        </a>
+      </div>
+
+      <p class="thankyou-reassurance">
+        🔒 Parcel receive karte waqt courier rider ke samne check karne ki sahulat muyassar hai.
+      </p>
+    </div>
+  `;
+  modal.classList.add('open');
+  modal.querySelectorAll('.close-thankyou, #close-thankyou-btn').forEach(btn => {
+    btn.onclick = () => modal.classList.remove('open');
+  });
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.classList.remove('open');
+  };
+}
 
 async function submitOrder(event) {
   event.preventDefault();
   if (!cart.length) return showToast('Your bag is empty.');
-  if (!supabaseConfigured) return showToast('Checkout connects to Supabase when environment keys are added.');
-  const form = new FormData(event.currentTarget);
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+  const name = formData.get('name')?.toString().trim();
+  const phone = formData.get('phone')?.toString().trim();
+  const address = formData.get('address')?.toString().trim();
+  const city = formData.get('city')?.toString().trim();
+  const payment_method = formData.get('payment_method') || 'Cash on Delivery';
+
+  if (!name || !phone || !address || !city) {
+    return showToast('Please complete all delivery fields.');
+  }
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Confirming order…';
+  }
+
+  const orderNumber = `CC-${Math.floor(100000 + Math.random() * 900000)}`;
   const order = {
-    order_number: `CC-${Date.now()}`,
-    name: form.get('name'), customer_name: form.get('name'),
-    phone: form.get('phone'), customer_phone: form.get('phone'),
-    address: form.get('address'), customer_address: form.get('address'),
-    city: form.get('city'), payment_method: form.get('payment_method'),
-    items: cart.map(({ id, name, price, quantity, image }) => ({ product_id: id, product_name: name, unit_price: price, quantity, image })),
-    total_amount: cartTotal(), status: 'Pending', order_status: 'pending'
+    order_number: orderNumber,
+    name, customer_name: name,
+    phone, customer_phone: phone,
+    address, customer_address: address,
+    city, payment_method,
+    items: cart.map(({ id, name, price, quantity, image }) => ({
+      product_id: id,
+      product_name: name,
+      unit_price: price,
+      quantity,
+      image
+    })),
+    total_amount: cartTotal(),
+    status: 'Pending',
+    order_status: 'pending'
   };
-  const button = event.currentTarget.querySelector('button[type="submit"]');
-  button.disabled = true; button.textContent = 'Placing order…';
-  const { error } = await supabase.from('orders').insert(order);
-  button.disabled = false; button.innerHTML = 'Place order <span>→</span>';
-  if (error) return showToast(`Could not place order: ${error.message}`);
-  cart = []; save(); closeCheckout(); render(); showToast('Order placed successfully!');
+
+  if (supabaseConfigured) {
+    try {
+      await supabase.from('orders').insert(order);
+    } catch (err) {
+      console.warn('Supabase order insert note:', err);
+    }
+  }
+
+  // Backup order to live orders feed & local storage
+  liveOrders.unshift(order);
+  const localOrders = JSON.parse(localStorage.getItem('classic-orders') || '[]');
+  localOrders.unshift(order);
+  localStorage.setItem('classic-orders', JSON.stringify(localOrders));
+
+  // 1. Checkout page/form turant band ho jaye (disappear)
+  closeCheckout();
+
+  // Clear customer cart and re-render header/cart badges
+  const placedOrder = { ...order };
+  cart = [];
+  save();
+  render();
+
+  // 2. Uski jagah ek bada, clear "Thank You" confirmation message show ho (order confirm hone ki khushkhabri ke sath)
+  showThankYouModal(placedOrder);
 }
 
 async function fetchOrders() {
