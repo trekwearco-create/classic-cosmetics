@@ -45,6 +45,11 @@ let isPollingActive = false;
    ========================================================================== */
 export const slugify = value => (value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const money = value => `Rs. ${Number(value || 0).toLocaleString('en-PK')}`;
+const paymentMethodLabel = method => ({
+  cod: 'Cash on Delivery',
+  easypaisa: 'EasyPaisa',
+  jazzcash: 'JazzCash'
+}[String(method || '').toLowerCase()] || method || 'Cash on Delivery');
 const saveCart = () => localStorage.setItem('classic-cart', JSON.stringify(cart));
 const cartCount = () => cart.reduce((total, item) => total + item.quantity, 0);
 const cartTotal = () => cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -237,7 +242,7 @@ function showThankYouModal(order) {
         <div class="info-row"><span class="info-label">Customer Name:</span><span class="info-val">${order.name || order.customer_name}</span></div>
         <div class="info-row"><span class="info-label">WhatsApp / Phone:</span><span class="info-val">${order.phone || order.customer_phone}</span></div>
         <div class="info-row"><span class="info-label">Delivery Address:</span><span class="info-val">${order.address || order.customer_address}, ${order.city}</span></div>
-        <div class="info-row"><span class="info-label">Payment Method:</span><span class="info-val"><strong>${order.payment_method}</strong></span></div>
+        <div class="info-row"><span class="info-label">Payment Method:</span><span class="info-val"><strong>${paymentMethodLabel(order.payment_method)}</strong></span></div>
         <div class="info-row"><span class="info-label">Estimated Delivery:</span><span class="info-val">2–4 Business Days (TCS / Leopard)</span></div>
       </div>
 
@@ -294,7 +299,7 @@ async function submitOrder(event) {
   const phone = formData.get('phone')?.toString().trim();
   const address = formData.get('address')?.toString().trim();
   const city = formData.get('city')?.toString().trim();
-  const payment_method = formData.get('payment_method') || 'Cash on Delivery';
+  const payment_method = formData.get('payment_method')?.toString() || 'cod';
 
   if (!name || !phone || !address || !city) {
     return showToast('Please complete all delivery fields.');
@@ -329,9 +334,16 @@ async function submitOrder(event) {
 
   if (supabaseConfigured) {
     try {
-      await supabase.from('orders').insert(order);
+      const { error } = await supabase.from('orders').insert(order);
+      if (error) throw error;
     } catch (err) {
-      console.warn('Supabase order insert note:', err);
+      console.error('Supabase order insert failed:', err);
+      showToast(`Could not place order: ${err instanceof Error ? err.message : 'Please try again.'}`);
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<span>Confirm Order</span><span>→</span>';
+      }
+      return;
     }
   }
 
@@ -722,7 +734,7 @@ function renderStorefrontShell(mainContentHtml) {
         <div class="checkout-header">
           <p class="eyebrow">Fast & Secure</p>
           <h2 id="checkout-title">Delivery Details</h2>
-          <p class="checkout-tagline">Enter your delivery details and confirm your order with Cash on Delivery.</p>
+          <p class="checkout-tagline">Enter your delivery details and choose your preferred payment method.</p>
         </div>
         <div class="checkout-summary-bar">
           <div class="summary-left">
@@ -760,18 +772,25 @@ function renderStorefrontShell(mainContentHtml) {
             <div class="form-group">
               <label for="checkout-payment">Payment Method <span class="req">*</span></label>
               <select id="checkout-payment" name="payment_method" required>
-                <option value="Cash on Delivery" selected>💵 Cash on Delivery (COD) - Recommended</option>
-                <option value="EasyPaisa">📱 EasyPaisa</option>
-                <option value="JazzCash">📱 JazzCash</option>
+                <option value="cod" selected>Cash on Delivery (COD) - Recommended</option>
+                <option value="easypaisa">EasyPaisa</option>
+                <option value="jazzcash">JazzCash</option>
               </select>
             </div>
           </div>
-          <div class="cod-reassurance-box">
+          <div class="cod-reassurance-box" id="cod-payment-details">
             <span class="cod-icon">🛡️</span>
             <div class="cod-text">
               <strong>Cash on Delivery Available Across Pakistan</strong>
               <small>Receive the parcel, inspect it, then pay the rider. Delivery is completely free.</small>
             </div>
+          </div>
+          <div class="easypaisa-payment-box" id="easypaisa-payment-details" hidden>
+            <strong>EasyPaisa payment details</strong>
+            <p>Account number: <b>03222495034</b></p>
+            <p>Account name: <b>Muhammad Imran</b></p>
+            <small>Payment karne ke baad screenshot WhatsApp par bhej dein, please.</small>
+            <a href="https://wa.me/923222495034?text=${encodeURIComponent('Assalam-o-Alaikum, I have paid via EasyPaisa. I am sending my payment screenshot for order confirmation.')}" target="_blank" rel="noopener noreferrer">WhatsApp par payment screenshot bhejein →</a>
           </div>
           <button class="button checkout-submit-btn" type="submit">
             <span>Confirm Order</span>
@@ -1694,32 +1713,44 @@ function renderAdmin() {
 
     document.querySelector('#admin-login-form')?.addEventListener('submit', async event => {
       event.preventDefault();
-      const form = new FormData(event.currentTarget);
-      const email = form.get('email');
-      const password = form.get('password');
-      if (email === 'admin@classiccosmetics.com' && password === 'Classic@2026') {
-        sessionStorage.setItem('classic-admin', 'true');
-        renderApp();
-        return;
+      const loginForm = event.currentTarget;
+      const form = new FormData(loginForm);
+      const email = form.get('email')?.toString().trim() || '';
+      const password = form.get('password')?.toString() || '';
+      const errorMessage = document.querySelector('#login-error');
+      const submitButton = loginForm.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Signing in…';
       }
-      if (supabaseConfigured) {
+      if (errorMessage) errorMessage.textContent = '';
+      try {
+        if (email === 'admin@classiccosmetics.com' && password === 'Classic@2026') {
+          sessionStorage.setItem('classic-admin', 'true');
+          renderApp();
+          return;
+        }
+        if (!supabaseConfigured) {
+          if (errorMessage) errorMessage.textContent = 'Email or password is incorrect.';
+          return;
+        }
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) { document.querySelector('#login-error').textContent = error.message; return; }
+        if (error) {
+          if (errorMessage) errorMessage.textContent = error.message;
+          return;
+        }
         sessionStorage.setItem('classic-admin', 'true');
         renderApp();
-        return;
+      } catch (err) {
+        console.error('Admin sign-in failed:', err);
+        if (errorMessage) errorMessage.textContent = err instanceof Error ? err.message : 'Sign-in failed. Please try again.';
+      } finally {
+        if (submitButton?.isConnected) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = 'Sign in <span>→</span>';
+        }
       }
-      document.querySelector('#login-error').textContent = 'Email or password is incorrect.';
     });
-    return;
-  }
-
-  const shopAllLink = e.target.closest('[data-nav-shop-all]');
-  if (shopAllLink) {
-    e.preventDefault();
-    document.querySelector('.mobile-menu')?.classList.remove('open');
-    navigate('/#shop');
-    document.querySelector('#shop')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
 
@@ -2047,7 +2078,7 @@ function renderOrderRows(ordersToRender) {
         <span>${name}<small>${phone}</small></span>
         <span>${address}</span>
         <span class="order-items">${items}</span>
-        <span>${o.payment_method || 'COD'}</span>
+        <span>${paymentMethodLabel(o.payment_method)}</span>
         <span>${money(Number(o.total_amount || 0))}</span>
         <span>
           <select class="status-select" data-order-id="${realId}">
@@ -2656,6 +2687,17 @@ function bindGlobalEvents() {
     btn.onclick = closeCheckout;
   });
 
+  const paymentSelect = document.querySelector('#checkout-payment');
+  const codPaymentDetails = document.querySelector('#cod-payment-details');
+  const easypaisaPaymentDetails = document.querySelector('#easypaisa-payment-details');
+  const updatePaymentDetails = () => {
+    const method = paymentSelect?.value;
+    if (codPaymentDetails) codPaymentDetails.hidden = method !== 'cod';
+    if (easypaisaPaymentDetails) easypaisaPaymentDetails.hidden = method !== 'easypaisa';
+  };
+  paymentSelect?.addEventListener('change', updatePaymentDetails);
+  updatePaymentDetails();
+
   document.querySelector('#checkout-form')?.addEventListener('submit', submitOrder);
 
   // Single Product Page Qty & Buy Now handlers
@@ -2790,6 +2832,17 @@ function bindGlobalEvents() {
 
   // Intercept Navigation Links for SPA smooth transitions
   document.body.onclick = (e) => {
+    const shopAllLink = e.target.closest('[data-nav-shop-all]');
+    if (shopAllLink) {
+      e.preventDefault();
+      document.querySelector('.mobile-menu')?.classList.remove('open');
+      const menu = document.querySelector('.mobile-menu');
+      if (menu) menu.setAttribute('aria-hidden', 'true');
+      navigate('/#shop');
+      document.querySelector('#shop')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
     // Nav Home
     const homeLink = e.target.closest('[data-nav-home]');
     if (homeLink) {
