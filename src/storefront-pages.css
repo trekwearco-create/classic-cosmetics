@@ -154,6 +154,14 @@
   transform: scale(1.08);
   border-color: var(--gold);
 }
+.brand-tile-avatar img {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  border-radius: inherit;
+  object-fit: contain;
+  background: #fff;
+}
 .brand-tile-name {
   font-family: 'DM Sans', sans-serif;
   font-size: 16px;
@@ -1085,6 +1093,33 @@
   gap: 9px;
   padding: 4px 4px 10px;
 }
+.mobile-menu-section-link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.mobile-menu button.mobile-menu-section-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.mobile-menu-section-link .mobile-menu-arrow {
+  margin-left: auto;
+}
+.mobile-menu-section-link:hover .mobile-menu-arrow {
+  transform: translateX(2px);
+  color: #8a7238;
+}
+.mobile-menu-section-toggle[aria-expanded="true"] .mobile-menu-arrow {
+  transform: rotate(90deg);
+}
 .mobile-menu-dot {
   width: 6px;
   height: 6px;
@@ -1106,14 +1141,19 @@
   flex-direction: column;
   gap: 7px;
 }
+.mobile-menu .mobile-menu-nav {
+  display: flex !important;
+}
+.mobile-menu .mobile-menu-nav[hidden] {
+  display: none !important;
+}
 .mobile-menu-item {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 12px 12px 12px 11px;
+  gap: 12px;
+  padding: 12px 14px;
   background: #fff;
-  border-radius: 13px;
+  border-radius: 10px;
   border: 1px solid #ece3d3;
   text-decoration: none;
   color: var(--ink);
@@ -1140,20 +1180,13 @@
   opacity: 1;
 }
 .mobile-menu-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 11px;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  display: none;
 }
 .mobile-menu-text {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
   min-width: 0;
   position: relative;
   z-index: 1;
@@ -1249,4 +1282,3 @@
     display: flex !important;
   }
 }
-

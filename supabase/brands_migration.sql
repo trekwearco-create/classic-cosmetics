@@ -9,6 +9,7 @@ create table if not exists public.brands (
 );
 
 alter table public.products add column if not exists brand_id uuid references public.brands(id) on delete set null;
+alter table public.brands add column if not exists logo_url text;
 alter table public.brands enable row level security;
 
 create policy "public read brands" on public.brands for select using (true);

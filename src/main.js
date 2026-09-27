@@ -442,10 +442,9 @@ function renderStorefrontShell(mainContentHtml) {
       <div class="mobile-menu-body">
         <div class="mobile-menu-section">
           <div class="mobile-menu-section-head">
-            <span class="mobile-menu-dot"></span>
-            <p class="eyebrow">Main Menu</p>
+            <button type="button" class="mobile-menu-section-link mobile-menu-section-toggle" aria-expanded="false" aria-controls="mobile-main-links"><span class="mobile-menu-dot"></span><span class="eyebrow">Main Menu</span><span class="mobile-menu-arrow">›</span></button>
           </div>
-          <nav class="mobile-menu-nav">
+          <nav class="mobile-menu-nav" id="mobile-main-links" hidden>
             <a href="/" data-nav-home="true" class="mobile-menu-item">
               <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#c6a664,#e4d4b8);">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -464,11 +463,10 @@ function renderStorefrontShell(mainContentHtml) {
 
         <div class="mobile-menu-section">
           <div class="mobile-menu-section-head">
-            <span class="mobile-menu-dot"></span>
-            <p class="eyebrow">Categories</p>
+            <button type="button" class="mobile-menu-section-link mobile-menu-section-toggle" aria-expanded="false" aria-controls="mobile-category-links"><span class="mobile-menu-dot"></span><span class="eyebrow">Categories</span><span class="mobile-menu-arrow">›</span></button>
           </div>
-          <nav class="mobile-menu-nav">
-            <a href="/#shop" data-nav-home="true" class="mobile-menu-item">
+          <nav class="mobile-menu-nav" id="mobile-category-links" hidden>
+            <a href="/#shop" data-nav-shop-all="true" class="mobile-menu-item">
               <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#c6a664,#e4c98e);">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="7" width="18" height="13" rx="2" ry="2"></rect>
@@ -509,10 +507,9 @@ function renderStorefrontShell(mainContentHtml) {
 
         <div class="mobile-menu-section">
           <div class="mobile-menu-section-head">
-            <span class="mobile-menu-dot"></span>
-            <p class="eyebrow">Help & Support</p>
+            <button type="button" class="mobile-menu-section-link mobile-menu-section-toggle" aria-expanded="false" aria-controls="mobile-help-links"><span class="mobile-menu-dot"></span><span class="eyebrow">Help & Support</span><span class="mobile-menu-arrow">›</span></button>
           </div>
-          <nav class="mobile-menu-nav">
+          <nav class="mobile-menu-nav" id="mobile-help-links" hidden>
             <a href="/track-order" data-nav-page="/track-order" class="mobile-menu-item">
               <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#74b9ff,#0984e3);">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -573,10 +570,9 @@ function renderStorefrontShell(mainContentHtml) {
 
         <div class="mobile-menu-section">
           <div class="mobile-menu-section-head">
-            <span class="mobile-menu-dot"></span>
-            <p class="eyebrow">Admin Access</p>
+            <button type="button" class="mobile-menu-section-link mobile-menu-section-toggle" aria-expanded="false" aria-controls="mobile-admin-links"><span class="mobile-menu-dot"></span><span class="eyebrow">Admin Access</span><span class="mobile-menu-arrow">›</span></button>
           </div>
-          <nav class="mobile-menu-nav">
+          <nav class="mobile-menu-nav" id="mobile-admin-links" hidden>
             <a href="/admin" class="mobile-menu-item">
               <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#2d3436,#636e72);">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -958,7 +954,7 @@ function renderHomePage() {
             const brandCat = b.category || '';
             return `
               <a class="brand-tile-card" href="/category/${slugify(brandCat)}/brand/${slugify(b.name)}" data-nav-brand-category="${brandCat}" data-nav-brand-name="${b.name}">
-                <div class="brand-tile-avatar">${initial}</div>
+                <div class="brand-tile-avatar">${b.logo ? `<img src="${b.logo}" alt="${b.name} logo" loading="lazy"/>` : initial}</div>
                 <strong class="brand-tile-name">${b.name}</strong>
                 <span class="brand-tile-count">${brandCat ? brandCat + ' · ' : ''}${count} product${count === 1 ? '' : 's'}</span>
                 <span class="brand-tile-cta">Shop Brand →</span>
@@ -1089,7 +1085,7 @@ function renderCategoryPage(categoryName) {
             const initial = (b.name || 'B').charAt(0).toUpperCase();
             return `
               <a class="brand-tile-card" href="/category/${slugify(categoryName)}/brand/${slugify(b.name)}" data-nav-brand-category="${categoryName}" data-nav-brand-name="${b.name}">
-                <div class="brand-tile-avatar">${initial}</div>
+                <div class="brand-tile-avatar">${b.logo ? `<img src="${b.logo}" alt="${b.name} logo" loading="lazy"/>` : initial}</div>
                 <strong class="brand-tile-name">${b.name}</strong>
                 <span class="brand-tile-count">${count} product${count === 1 ? '' : 's'}</span>
                 <span class="brand-tile-cta">Shop Brand →</span>
@@ -1718,6 +1714,15 @@ function renderAdmin() {
     return;
   }
 
+  const shopAllLink = e.target.closest('[data-nav-shop-all]');
+  if (shopAllLink) {
+    e.preventDefault();
+    document.querySelector('.mobile-menu')?.classList.remove('open');
+    navigate('/#shop');
+    document.querySelector('#shop')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
   // Admin shell
   document.querySelector('#app').innerHTML = `
     <div class="admin-shell">
@@ -1810,7 +1815,7 @@ function renderAdminViewContent() {
             </div>
             <label>Shade / Variant<input name="shade" placeholder="e.g. Natural Sand, 50ml"/></label>
             <label>Product Image
-              <input name="imageFile" type="file" accept="image/*" capture="environment"/>
+              <input name="imageFile" type="file" accept="image/*" required/>
             </label>
             <div class="admin-image-preview" id="product-image-preview" style="display:none;margin:8px 0 14px;">
               <img src="" alt="Product preview" style="max-height:120px;border-radius:12px;border:1px solid #e8dec9;box-shadow:0 3px 10px rgba(0,0,0,0.05);"/>
@@ -1883,7 +1888,7 @@ function renderAdminViewContent() {
               <input name="name" required placeholder="e.g. Garnier, Nivea, CeraVe"/>
             </label>
             <label>Brand Logo (Optional)
-              <input name="brandLogo" type="file" accept="image/*" capture="environment"/>
+              <input name="brandLogo" type="file" accept="image/*"/>
             </label>
             <div class="admin-image-preview" id="brand-logo-preview" style="display:none;margin:8px 0 14px;">
               <img src="" alt="Brand logo preview" style="max-height:90px;max-width:220px;object-fit:contain;border-radius:12px;border:1px solid #e8dec9;padding:8px;background:#fff;"/>
@@ -2100,31 +2105,21 @@ function attachAdminDynamicForms() {
   // Upload image to Supabase storage (or base64 fallback)
   async function uploadImageFile(file, bucketName = 'product-images') {
     if (!file || !file.size) return null;
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('Image is too large (max 5MB). Compress and try again.');
-      return null;
-    }
+    if (file.size > 5 * 1024 * 1024) throw new Error('Image is too large (max 5MB). Compress and try again.');
+    if (!file.type.startsWith('image/')) throw new Error('Please select a valid image file.');
     if (supabaseConfigured) {
-      try {
-        const ext = (file.name || '').split('.').pop()?.toLowerCase() || 'png';
-        const safeName = `${crypto.randomUUID()}.${ext}`;
-        const path = `${safeName}`;
-        const { error: uploadErr } = await supabase.storage.from(bucketName).upload(path, file, { upsert: true, contentType: file.type });
-        if (!uploadErr) {
-          const { data } = supabase.storage.from(bucketName).getPublicUrl(path);
-          if (data?.publicUrl) return data.publicUrl;
-        } else {
-          console.warn('Supabase storage upload failed, falling back to local embed:', uploadErr);
-          showToast('Supabase storage unavailable — image saved locally embedded.');
-        }
-      } catch (err) {
-        console.warn('Storage upload error, falling back to base64:', err);
-      }
+      const ext = (file.name || '').split('.').pop()?.toLowerCase() || 'png';
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from(bucketName).upload(path, file, { upsert: true, contentType: file.type });
+      if (uploadErr) throw new Error(`Image upload failed: ${uploadErr.message}`);
+      const { data } = supabase.storage.from(bucketName).getPublicUrl(path);
+      if (data?.publicUrl) return data.publicUrl;
+      throw new Error('Image uploaded but Supabase did not return a public URL.');
     }
-    return await new Promise(resolve => {
+    return await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result);
-      reader.onerror = () => resolve(null);
+      reader.onerror = () => reject(new Error('Could not read the selected image.'));
       reader.readAsDataURL(file);
     });
   }
@@ -2238,17 +2233,27 @@ function attachAdminDynamicForms() {
   if (catForm) {
     catForm.onsubmit = async (e) => {
       e.preventDefault();
-      const name = new FormData(catForm).get('name').trim();
-      if (!name || categories.includes(name)) return;
-      categories.push(name);
-      saveAdminData();
-      if (supabaseConfigured) {
-        await supabase.from('categories').upsert({ name, slug: slugify(name) });
+      const name = new FormData(catForm).get('name')?.toString().trim() || '';
+      if (!name || categories.some(category => category.toLowerCase() === name.toLowerCase())) return;
+      const submitButton = catForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+      try {
+        if (supabaseConfigured) {
+          const { error } = await supabase.from('categories').upsert({ name, slug: slugify(name) }, { onConflict: 'name' });
+          if (error) throw error;
+        }
+        categories.push(name);
+        saveAdminData();
+        showToast(`Category "${name}" added.`);
+        const content = document.querySelector('#admin-view-content');
+        if (content) content.innerHTML = renderAdminViewContent();
+        attachAdminDynamicForms();
+      } catch (err) {
+        console.error('Category save failed:', err);
+        showToast(`Category save failed: ${err instanceof Error ? err.message : 'Please try again.'}`);
+      } finally {
+        if (submitButton) submitButton.disabled = false;
       }
-      showToast(`Category "${name}" added.`);
-      const content = document.querySelector('#admin-view-content');
-      if (content) content.innerHTML = renderAdminViewContent();
-      attachAdminDynamicForms();
     };
   }
 
@@ -2258,24 +2263,40 @@ function attachAdminDynamicForms() {
     brandForm.onsubmit = async (e) => {
       e.preventDefault();
       const fd = new FormData(brandForm);
-      const category = fd.get('category');
-      const name = fd.get('name').trim();
+      const category = fd.get('category')?.toString() || '';
+      const name = fd.get('name')?.toString().trim() || '';
       if (!name || brands.some(b => b.category === category && b.name.toLowerCase() === name.toLowerCase())) {
         return showToast('Brand already exists in this category.');
       }
-      const newBrand = { id: crypto.randomUUID(), name, category };
-      brands.push(newBrand);
-      saveAdminData();
-      if (supabaseConfigured) {
-        const { data: catRow } = await supabase.from('categories').select('id').eq('name', category).maybeSingle();
-        if (catRow) {
-          await supabase.from('brands').insert({ name, slug: slugify(name), category_id: catRow.id });
+      const submitButton = brandForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+      try {
+        const logoFile = fd.get('brandLogo');
+        const logo = logoFile instanceof File && logoFile.size ? await uploadImageFile(logoFile) : '';
+        const newBrand = { id: crypto.randomUUID(), name, category, logo };
+        if (supabaseConfigured) {
+          const { data: catRow, error: categoryError } = await supabase.from('categories').select('id').eq('name', category).maybeSingle();
+          if (categoryError) throw categoryError;
+          if (!catRow) throw new Error(`Category "${category}" was not found in Supabase.`);
+          const { data: brandRow, error: brandError } = await supabase.from('brands')
+            .insert({ name, slug: slugify(name), category_id: catRow.id, logo_url: logo || null })
+            .select('id')
+            .single();
+          if (brandError) throw brandError;
+          newBrand.id = brandRow.id;
         }
+        brands.push(newBrand);
+        saveAdminData();
+        showToast(`Brand "${name}" added under ${category}.`);
+        const content = document.querySelector('#admin-view-content');
+        if (content) content.innerHTML = renderAdminViewContent();
+        attachAdminDynamicForms();
+      } catch (err) {
+        console.error('Brand save failed:', err);
+        showToast(`Brand save failed: ${err instanceof Error ? err.message : 'Please try again.'}`);
+      } finally {
+        if (submitButton) submitButton.disabled = false;
       }
-      showToast(`Brand "${name}" added under ${category}.`);
-      const content = document.querySelector('#admin-view-content');
-      if (content) content.innerHTML = renderAdminViewContent();
-      attachAdminDynamicForms();
     };
   }
 
@@ -2285,39 +2306,84 @@ function attachAdminDynamicForms() {
     prodForm.onsubmit = async (e) => {
       e.preventDefault();
       const fd = new FormData(prodForm);
-      const index = fd.get('index');
+      const index = fd.get('index')?.toString() || '';
       const existing = index === '' ? null : products[Number(index)];
-      const name = fd.get('name').trim();
-      const type = fd.get('category');
-      const brand = fd.get('brand') || '';
+      const name = fd.get('name')?.toString().trim() || '';
+      const type = fd.get('category')?.toString() || '';
+      const brand = fd.get('brand')?.toString() || '';
       const price = Number(fd.get('price'));
       const originalPrice = Number(fd.get('originalPrice')) || (price > 0 ? Math.round(price * 1.35) : 0);
-      const shade = fd.get('shade') || '';
-      const image = fd.get('imageUrl') || existing?.image || 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=700&q=85';
-      const description = fd.get('description') || '';
+      const shade = fd.get('shade')?.toString() || '';
+      const description = fd.get('description')?.toString() || '';
+      const submitButton = prodForm.querySelector('button[type="submit"]');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Uploading & saving…';
+      }
+      try {
+        const imageFile = fd.get('imageFile');
+        const uploadedImage = imageFile instanceof File && imageFile.size ? await uploadImageFile(imageFile) : '';
+        if (imageFile instanceof File && imageFile.size && !uploadedImage) throw new Error('Could not upload the selected image.');
+        const image = uploadedImage || existing?.image || 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=700&q=85';
+        const existingIdIsUuid = existing && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(existing.id);
+        const productObj = {
+          id: existingIdIsUuid ? existing.id : crypto.randomUUID(),
+          name,
+          type,
+          brand,
+          price,
+          originalPrice,
+          shade,
+          image,
+          description,
+          rating: existing?.rating || 4.9,
+          reviews: existing?.reviews || 32
+        };
 
-      const productObj = {
-        id: existing?.id || crypto.randomUUID(),
-        name,
-        type,
-        brand,
-        price,
-        originalPrice,
-        shade,
-        image,
-        description,
-        rating: existing?.rating || 4.9,
-        reviews: existing?.reviews || 32
-      };
+        if (supabaseConfigured) {
+          const { data: categoryRow, error: categoryError } = await supabase.from('categories').select('id').eq('name', type).maybeSingle();
+          if (categoryError) throw categoryError;
+          if (!categoryRow) throw new Error(`Category "${type}" was not found in Supabase.`);
+          let brandId = null;
+          if (brand) {
+            const { data: brandRow, error: brandError } = await supabase.from('brands')
+              .select('id')
+              .eq('category_id', categoryRow.id)
+              .eq('name', brand)
+              .maybeSingle();
+            if (brandError) throw brandError;
+            brandId = brandRow?.id || null;
+          }
+          const { error: productError } = await supabase.from('products').upsert({
+            id: productObj.id,
+            name,
+            description,
+            category_id: categoryRow.id,
+            brand_id: brandId,
+            price,
+            stock: existing?.stock || 0,
+            images: [image],
+            status: 'in_stock'
+          });
+          if (productError) throw productError;
+        }
 
-      if (existing) products[Number(index)] = productObj;
-      else products.push(productObj);
-
-      saveAdminData();
-      showToast(`Product "${name}" saved.`);
-      const content = document.querySelector('#admin-view-content');
-      if (content) content.innerHTML = renderAdminViewContent();
-      attachAdminDynamicForms();
+        if (existing) products[Number(index)] = productObj;
+        else products.push(productObj);
+        saveAdminData();
+        showToast(`Product "${name}" saved.`);
+        const content = document.querySelector('#admin-view-content');
+        if (content) content.innerHTML = renderAdminViewContent();
+        attachAdminDynamicForms();
+      } catch (err) {
+        console.error('Product save failed:', err);
+        showToast(`Product save failed: ${err instanceof Error ? err.message : 'Please try again.'}`);
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Save product →';
+        }
+      }
     };
   }
 
@@ -2336,7 +2402,16 @@ function attachAdminDynamicForms() {
       form.elements.price.value = p.price;
       form.elements.originalPrice.value = p.originalPrice || '';
       form.elements.shade.value = p.shade || '';
-      form.elements.imageUrl.value = p.image || '';
+      form.elements.imageFile.value = '';
+      form.elements.imageFile.required = !p.image;
+      const preview = document.querySelector('#product-image-preview');
+      const previewImage = preview?.querySelector('img');
+      if (previewImage && p.image) {
+        previewImage.src = p.image;
+        preview.style.display = 'block';
+      } else if (preview) {
+        preview.style.display = 'none';
+      }
       form.elements.description.value = p.description || '';
       document.querySelector('#product-form-title').textContent = `Edit ${p.name}`;
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2375,15 +2450,26 @@ function attachAdminDynamicForms() {
 
   // Delete Category Button
   document.querySelectorAll('[data-delete-category]').forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
       const idx = Number(btn.dataset.deleteCategory);
-      if (categories[idx] && confirm(`Delete category "${categories[idx]}"?`)) {
+      const category = categories[idx];
+      if (!category || !confirm(`Delete category "${category}"?`)) return;
+      btn.disabled = true;
+      try {
+        if (supabaseConfigured) {
+          const { error } = await supabase.from('categories').delete().eq('name', category);
+          if (error) throw error;
+        }
         categories.splice(idx, 1);
         saveAdminData();
         const content = document.querySelector('#admin-view-content');
         if (content) content.innerHTML = renderAdminViewContent();
         attachAdminDynamicForms();
         showToast('Category deleted.');
+      } catch (err) {
+        console.error('Category delete failed:', err);
+        showToast(`Category delete failed: ${err instanceof Error ? err.message : 'Please try again.'}`);
+        btn.disabled = false;
       }
     };
   });
@@ -2539,6 +2625,16 @@ function bindGlobalEvents() {
     const menu = document.querySelector('.mobile-menu');
     menu?.classList.remove('open');
     if (menu) menu.setAttribute('aria-hidden', 'true');
+  });
+
+  document.querySelectorAll('.mobile-menu-section-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      const contentId = button.getAttribute('aria-controls');
+      const sectionContent = contentId ? document.getElementById(contentId) : null;
+      if (sectionContent) sectionContent.hidden = expanded;
+    });
   });
 
   // Cart item remove
@@ -2805,6 +2901,17 @@ function setupPromoCarousel() {
    ========================================================================== */
 async function syncFromSupabase() {
   if (!supabaseConfigured) return;
+  if (!catalogueChannel) {
+    catalogueChannel = supabase.channel('storefront-categories')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => {
+        void syncFromSupabase();
+      })
+      .subscribe(status => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error(`Supabase category updates unavailable: ${status}`);
+        }
+      });
+  }
   try {
     const [{ data: catData }, { data: brandData }, { data: prodData }, { data: secData }] = await Promise.all([
       supabase.from('categories').select('*').order('name'),
@@ -2814,7 +2921,7 @@ async function syncFromSupabase() {
     ]);
 
     if (catData?.length) categories = catData.map(c => c.name);
-    if (brandData?.length) brands = brandData.map(b => ({ id: b.id, name: b.name, category: b.categories?.name || '' }));
+    if (brandData?.length) brands = brandData.map(b => ({ id: b.id, name: b.name, category: b.categories?.name || '', logo: b.logo_url || b.logo || '' }));
     if (prodData?.length) {
       products = prodData.map(p => ({
         ...p,
