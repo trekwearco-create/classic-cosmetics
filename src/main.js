@@ -123,6 +123,14 @@ function getRoute() {
     return { view: 'category', category };
   }
 
+  // Standalone Static & Informational Pages
+  if (path === '/about' || search.get('page') === 'about') return { view: 'about' };
+  if (path === '/faqs' || path === '/faq' || search.get('page') === 'faqs' || search.get('page') === 'faq') return { view: 'faqs' };
+  if (path === '/delivery-and-returns' || path === '/delivery' || path === '/returns' || search.get('page') === 'delivery-and-returns') return { view: 'delivery-and-returns' };
+  if (path === '/track-order' || search.get('page') === 'track-order') return { view: 'track-order' };
+  if (path === '/privacy-policy' || search.get('page') === 'privacy-policy') return { view: 'privacy-policy' };
+  if (path === '/terms' || search.get('page') === 'terms') return { view: 'terms' };
+
   return { view: 'home' };
 }
 
@@ -430,19 +438,99 @@ function renderStorefrontShell(mainContentHtml) {
       ${mainContentHtml}
     </main>
 
-    <footer>
-      <a class="logo" href="/" data-nav-home="true"><span>CLASSIC</span><em>cosmetics</em></a>
-      <div>
-        <strong>Categories</strong>
-        ${categories.map(cat => `<a href="/category/${slugify(cat)}" data-nav-category="${cat}">${cat}</a>`).join('')}
+    <footer class="site-footer">
+      <div class="footer-accordion-wrap">
+        <!-- 1. Contact Us Accordion -->
+        <div class="footer-accordion-item">
+          <button class="footer-accordion-btn" type="button" aria-expanded="false">
+            <span class="footer-accordion-title">Contact Us</span>
+            <span class="footer-accordion-icon">+</span>
+          </button>
+          <div class="footer-accordion-content">
+            <div class="footer-content-inner">
+              <a class="footer-contact-row" href="tel:+923222495034">
+                <span class="footer-contact-icon">📞</span>
+                <span>+92 322 2495034</span>
+              </a>
+              <a class="footer-contact-row" href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">
+                <span class="footer-contact-icon">💬</span>
+                <span>WhatsApp: +92 322 2495034</span>
+              </a>
+              <a class="footer-contact-row" href="mailto:support@classiccosmetics.pk">
+                <span class="footer-contact-icon">✉</span>
+                <span>support@classiccosmetics.pk</span>
+              </a>
+              <div class="footer-contact-row" style="color:#666;">
+                <span class="footer-contact-icon">📍</span>
+                <span>DHA Phase 5, Lahore, Pakistan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Our Company Accordion -->
+        <div class="footer-accordion-item">
+          <button class="footer-accordion-btn" type="button" aria-expanded="false">
+            <span class="footer-accordion-title">Our Company</span>
+            <span class="footer-accordion-icon">+</span>
+          </button>
+          <div class="footer-accordion-content">
+            <div class="footer-content-inner">
+              <p class="footer-desc-text">
+                Classic Cosmetics Pakistan ka ek premium beauty destination hai jo 100% original skincare, makeup aur luxurious fragrances faraham karta hai. Hum highest quality products aur customer trust par yaqeen rakhte hain.
+              </p>
+              <a class="footer-sub-link" href="/about" data-nav-page="/about">About Us</a>
+              <a class="footer-sub-link" href="/faqs" data-nav-page="/faqs">FAQ's</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Categories Accordion (Dynamic from Database) -->
+        <div class="footer-accordion-item">
+          <button class="footer-accordion-btn" type="button" aria-expanded="false">
+            <span class="footer-accordion-title">Categories</span>
+            <span class="footer-accordion-icon">+</span>
+          </button>
+          <div class="footer-accordion-content">
+            <div class="footer-content-inner">
+              ${categories.map(cat => `<a class="footer-sub-link" href="/category/${slugify(cat)}" data-nav-category="${cat}">${cat}</a>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Policies Accordion -->
+        <div class="footer-accordion-item">
+          <button class="footer-accordion-btn" type="button" aria-expanded="false">
+            <span class="footer-accordion-title">Policies</span>
+            <span class="footer-accordion-icon">+</span>
+          </button>
+          <div class="footer-accordion-content">
+            <div class="footer-content-inner">
+              <a class="footer-sub-link" href="/privacy-policy" data-nav-page="/privacy-policy">Privacy & Cookies Policy</a>
+              <a class="footer-sub-link" href="/terms" data-nav-page="/terms">Terms & Conditions</a>
+              <a class="footer-sub-link" href="/delivery-and-returns" data-nav-page="/delivery-and-returns">Delivery & Return</a>
+              <a class="footer-sub-link" href="/track-order" data-nav-page="/track-order">Track Your Order</a>
+            </div>
+          </div>
+        </div>
       </div>
-      <div>
-        <strong>Customer care</strong>
-        <a href="#contact">Contact us</a>
-        <a href="#">Delivery & returns</a>
-        <a href="/admin">Admin Login</a>
+
+      <!-- Footer Brand Emblem & Trust Highlights -->
+      <div class="footer-brand-emblem-wrap">
+        <div class="footer-crown-badge">👑</div>
+        <p class="footer-tagline-text">Classic Cosmetics — Pakistan's #1 Destination for Authentic Luxury Beauty.</p>
+        <div class="footer-trust-strip">
+          <span class="footer-trust-item">✦ 100% Authentic Products</span>
+          <span class="footer-trust-item">✦ Fast 2-4 Days Delivery</span>
+          <span class="footer-trust-item">✦ 7 Days Easy Return & Exchange</span>
+          <span class="footer-trust-item">✦ Cash on Delivery Across Pakistan</span>
+        </div>
       </div>
-      <p>© 2026 Classic Cosmetics.<br />Elegance in every detail.</p>
+
+      <!-- Copyright Bar -->
+      <div class="footer-copyright-bar">
+        Copyright © 2026 Classic Cosmetics | All rights reserved.
+      </div>
     </footer>
 
     <a class="whatsapp" href="https://wa.me/923222495034?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Classic Cosmetics on WhatsApp">◔</a>
@@ -999,6 +1087,375 @@ function renderProductPage(productId) {
   `;
 
   return renderStorefrontShell(productHtml);
+}
+
+/* ==========================================================================
+   PAGE: ABOUT US (Standalone Brand Story)
+   ========================================================================== */
+function renderAboutPage() {
+  const aboutHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">About Us</span>
+      </div>
+    </div>
+
+    <div class="standalone-page-container">
+      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
+        <p class="eyebrow">The Classic Philosophy</p>
+        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(32px, 4vw, 48px); margin: 8px 0 16px;">Elegance, Made Everyday</h1>
+      </div>
+
+      <div class="page-lead-card">
+        <p>
+          Classic Cosmetics was founded with a singular conviction: luxury beauty should be timeless, uncompromising in quality, and completely authentic. We curate premier international and artisanal skincare, makeup, and perfumes for discerning beauty lovers across Pakistan.
+        </p>
+      </div>
+
+      <div class="about-pillars-grid">
+        <div class="about-pillar-card">
+          <div class="about-pillar-icon">✨</div>
+          <h3>100% Genuine & Authentic</h3>
+          <p>Hamara sab se pehla usool authenticity hai. Hum sirf direct brand partners aur verified distributors se sourcing karte hain. Zero replicas, guaranteed original products.</p>
+        </div>
+        <div class="about-pillar-card">
+          <div class="about-pillar-icon">🌿</div>
+          <h3>Curated For Every Ritual</h3>
+          <p>Har formula ko Pakistani climate aur skin tones ke mutabiq thoughtfully choose kiya gaya hai taake aapko radiance aur care dono hasil hon.</p>
+        </div>
+        <div class="about-pillar-card">
+          <div class="about-pillar-icon">🛡️</div>
+          <h3>Customer Trust & Transparency</h3>
+          <p>Cash on Delivery, delivery ke waqt parcel verification, aur 7-day hassle-free return & exchange policy ke sath pure peace of mind.</p>
+        </div>
+        <div class="about-pillar-card">
+          <div class="about-pillar-icon">🚚</div>
+          <h3>Rapid Nationwide Delivery</h3>
+          <p>Lahore, Karachi, Islamabad se le kar har chhotay bare sheher tak fast 2-4 working days ke andar free delivery aapke ghar ke darwaze tak.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 48px; text-align: center; padding: 36px 20px; background: #fff; border: 1px solid #eee7dd; border-radius: 12px;">
+        <h3 style="font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 12px;">Experience Classic Cosmetics Today</h3>
+        <p style="color: #666; max-width: 500px; margin: 0 auto 24px; font-size: 14px;">Browse our handpicked collections of skincare essentials, velvet lip colors, and timeless fragrances.</p>
+        <a class="button" href="/" data-nav-home="true">Shop The Collection <span>→</span></a>
+      </div>
+    </div>
+  `;
+  return renderStorefrontShell(aboutHtml);
+}
+
+/* ==========================================================================
+   PAGE: FAQ'S (Frequently Asked Questions)
+   ========================================================================== */
+function renderFaqsPage() {
+  const faqsHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">FAQ's</span>
+      </div>
+    </div>
+
+    <div class="standalone-page-container">
+      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
+        <p class="eyebrow">Help & Customer Care</p>
+        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(30px, 4vw, 44px); margin: 8px 0 16px;">Frequently Asked Questions</h1>
+      </div>
+
+      <div class="page-lead-card">
+        <p>Order karne, payment methods, delivery timelines aur returns se mutalliq aksar pooche jane wale sawalat ke asaan aur wazeh jawabat:</p>
+      </div>
+
+      <div class="faq-accordion-container">
+        <!-- Q1 -->
+        <div class="faq-item-card open">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Order kaise place karein?</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Website par kisi bhi pasandeeda product par click karein aur <strong>"Add to Bag"</strong> ya <strong>"Buy Now"</strong> select karein. Phir Shopping Bag open karke <strong>"Secure Checkout"</strong> par click karein. Apna Name, WhatsApp/Mobile number aur Delivery Address enter karein aur <strong>"Confirm Order"</strong> daba dein. Aapka order foran confirm ho jayega!
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="faq-item-card">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Payment methods kya hain? (COD, EasyPaisa, JazzCash)</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Hum poore Pakistan mein <strong>Cash on Delivery (COD)</strong> offer karte hain — parcel receive karne ke baad rider ko cash payment karein. Iske ilawa <strong>EasyPaisa</strong> aur <strong>JazzCash</strong> digital transfer ke zariye bhi aasaani se payment ki ja sakti hai.
+            </div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="faq-item-card">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Delivery mein kitna time lagta hai?</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Order confirm hone ke baad <strong>2 se 4 working days</strong> ke andar delivery ho jati hai. Major cities (Lahore, Karachi, Islamabad, Rawalpindi) mein aksar 2-3 din ke andar parcel delivered ho jata hai.
+            </div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="faq-item-card">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Agar product damaged ya wrong aaye to Return kaise karein?</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Classic Cosmetics <strong>7 din ki aasaan return aur exchange policy</strong> provide karta hai. Agar product damaged, leaked ya wrong dispatch hua ho to product ke sath mojood return slip ke sath hamare WhatsApp (+92 322 2495034) par photo/video share karein. Hamari team foran replacement unit ya refund arrange karegi bina kisi extra shipping charges ke.
+            </div>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="faq-item-card">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Kya sabhi products 100% authentic aur original hain?</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Ji bilkul 100%! Classic Cosmetics par har product 100% authentic aur original brand stock hota hai. Hum direct authorized brand distributors aur brand partners se stock procure karte hain. Har product original packaging aur verifiable batch codes ke sath deliver hota hai.
+            </div>
+          </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="faq-item-card">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Delivery charges kitne hain?</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Classic Cosmetics par sabhi orders par delivery <strong>bilkul FREE</strong> hai nationwide! Aapko koi additional delivery charges ada nahi karne partay.
+            </div>
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="faq-item-card">
+          <button class="faq-question-btn" type="button">
+            <span class="faq-question-text">Apna order kaise track karein?</span>
+            <span class="faq-icon-symbol">+</span>
+          </button>
+          <div class="faq-answer-body">
+            <div class="faq-answer-inner">
+              Aap website footer mein mojood <a href="/track-order" data-nav-page="/track-order" style="color:var(--gold); font-weight:600;">Track Your Order</a> page par ja kar apna Order ID ya phone number darj karke live status check kar sakte hain, ya direct hamare WhatsApp helpline par rabta kar sakte hain.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WhatsApp Help CTA -->
+      <div style="margin-top: 36px; text-align: center; padding: 24px; background: #fdf5e6; border: 1px solid #ebdcc5; border-radius: 12px;">
+        <h4 style="margin: 0 0 8px; font-size: 16px;">Koi aur sawal hai? Hamare sath live chat karein!</h4>
+        <p style="color: #666; font-size: 13px; margin: 0 0 16px;">Hamari customer care team subah 10 baje se raat 10 baje tak active rehti hai.</p>
+        <a class="button" href="https://wa.me/923222495034?text=Salam!%20Mujhe%20ek%20sawal%20poochna%20hai" target="_blank" rel="noopener noreferrer">
+          Chat on WhatsApp (+92 322 2495034) <span>💬</span>
+        </a>
+      </div>
+    </div>
+  `;
+  return renderStorefrontShell(faqsHtml);
+}
+
+/* ==========================================================================
+   PAGE: DELIVERY & RETURN (Standalone Dedicated Page)
+   ========================================================================== */
+function renderDeliveryReturnsPage() {
+  const deliveryHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">Delivery & Returns</span>
+      </div>
+    </div>
+
+    <div class="standalone-page-container">
+      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
+        <p class="eyebrow">Shipping & Customer Protection</p>
+        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(30px, 4vw, 44px); margin: 8px 0 16px;">Delivery & Return Policy</h1>
+      </div>
+
+      <div class="page-lead-card">
+        <p>
+          Classic Cosmetics par hamara maqsad aap tak 100% authentic cosmetics be-had aasani aur tezi ke sath pohanchana hai. Hum transparency aur customer satisfaction ko first priority dete hain.
+        </p>
+      </div>
+
+      <!-- 3-Step Delivery Process -->
+      <h3 style="font-family:'Playfair Display',serif; font-size: 22px; margin: 36px 0 16px;">Delivery Process</h3>
+      <div class="delivery-steps-grid">
+        <div class="step-card">
+          <span class="step-number">1</span>
+          <h4>Order Confirmation</h4>
+          <p>Jaise hi aap order submit karte hain, hamari dispatch team details confirm karke parcel pack karti hai.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-number">2</span>
+          <h4>2 - 4 Working Days</h4>
+          <p>Order confirm hone ke 2-3 se 4 working days ke andar delivery rider aapke address par parcel deliver karta hai.</p>
+        </div>
+        <div class="step-card">
+          <span class="step-number">3</span>
+          <h4>Cash on Delivery</h4>
+          <p>Parcel haath mein lene par tasalli se cash rider ko ada karein. Free delivery nationwide across Pakistan.</p>
+        </div>
+      </div>
+
+      <!-- Return & Exchange Policy -->
+      <h3 style="font-family:'Playfair Display',serif; font-size: 22px; margin: 36px 0 16px;">Return & Exchange Policy</h3>
+      <div style="background:#fff; border: 1px solid #ebdcc5; border-radius: 12px; padding: 26px 24px; line-height: 1.7; font-size: 14px; color:#444;">
+        <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <li>
+            <strong>7 Days Return & Exchange Window:</strong> Agar product transit mein damaged ho gaya ho, leak hua ho, ya galat product deliver ho gaya ho, to aap delivery ke 7 din ke andar return ya exchange request submit kar sakte hain.
+          </li>
+          <li>
+            <strong>Return Slip Requirement:</strong> Har delivered order ke parcel mein delivery/return slip mojood hoti hai. Product ko return slip aur original brand packaging ke sath handover kiya ja sakta hai.
+          </li>
+          <li>
+            <strong>Product Exchange Available:</strong> Agar aap same product ka replacement ya kisi doosri variant/shade ka exchange chahte hain, to hamari team defined period (7 din) ke andar prompt exchange arrange karegi.
+          </li>
+          <li>
+            <strong>Zero Extra Shipping Charges:</strong> Agar damage ya galat product hamari taraf se dispatch hua ho, to customer ko koi shipping fee ada nahi karni hogi. Hum free pickup aur replacement provide karte hain.
+          </li>
+          <li>
+            <strong>Refund Method:</strong> Product inspect hone ke baad refund amount aapke EasyPaisa, JazzCash ya Bank Account mein 24-48 ghanton ke andar transfer kar di jati hai.
+          </li>
+        </ul>
+      </div>
+
+      <div class="policy-callout-box">
+        <span style="font-size:24px;">🛡️</span>
+        <p>
+          <strong>Hassle-Free Guarantee:</strong> Return ya exchange start karne ke liye sirf hamare WhatsApp Helpline <strong>+92 322 2495034</strong> par order slip aur product ki photo send karein. Hamari team foran process shuru kar degi.
+        </p>
+      </div>
+    </div>
+  `;
+  return renderStorefrontShell(deliveryHtml);
+}
+
+/* ==========================================================================
+   PAGE: TRACK ORDER (Standalone Interactive Order Tracking)
+   ========================================================================== */
+function renderTrackOrderPage() {
+  const trackHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">Track Your Order</span>
+      </div>
+    </div>
+
+    <div class="standalone-page-container">
+      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
+        <p class="eyebrow">Real-Time Dispatch Updates</p>
+        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(30px, 4vw, 44px); margin: 8px 0 16px;">Track Your Order</h1>
+      </div>
+
+      <div class="track-order-card">
+        <p style="color:#555; font-size:14px; margin:0 0 10px;">Apna Order ID (e.g. CC-10492) ya Checkout par diya gaya WhatsApp Phone Number enter karein:</p>
+        <div class="track-input-group">
+          <input type="text" id="track-query-input" placeholder="e.g. CC-1082 ya 0300-1234567" aria-label="Order ID or Phone Number" />
+          <button type="button" id="track-submit-btn">Track Order</button>
+        </div>
+        <div id="track-result-container">
+          <div style="text-align:center; padding: 20px 0; color:#888; font-size:13px;">
+            Order status dekhne ke liye upar apna number ya order number likh kar <b>Track Order</b> dabayein.
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 36px; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div style="background:#fff; border:1px solid #eee7dd; border-radius:10px; padding:20px; text-align:center;">
+          <h4 style="margin:0 0 6px; font-size:15px;">Need Live Support?</h4>
+          <p style="color:#666; font-size:12.5px; margin:0 0 12px;">Hamare courier logistics team se WhatsApp par foran status updates lein.</p>
+          <a class="button" href="https://wa.me/923222495034?text=Salam!%20Mujhe%20apne%20order%20ka%20status%20track%20karna%20hai" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
+            WhatsApp Tracker <span>💬</span>
+          </a>
+        </div>
+        <div style="background:#fff; border:1px solid #eee7dd; border-radius:10px; padding:20px; text-align:center;">
+          <h4 style="margin:0 0 6px; font-size:15px;">Delivery Timeline</h4>
+          <p style="color:#666; font-size:12.5px; margin:0 0 12px;">Standard express nationwide shipping typically takes 2 - 4 working days.</p>
+          <a class="text-link" href="/delivery-and-returns" data-nav-page="/delivery-and-returns">Read Delivery Policy →</a>
+        </div>
+      </div>
+    </div>
+  `;
+  return renderStorefrontShell(trackHtml);
+}
+
+/* ==========================================================================
+   PAGE: POLICIES (Privacy & Cookies / Terms)
+   ========================================================================== */
+function renderPoliciesPage(type) {
+  const isPrivacy = type === 'privacy-policy';
+  const title = isPrivacy ? 'Privacy & Cookies Policy' : 'Terms & Conditions';
+  const policyHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">${title}</span>
+      </div>
+    </div>
+
+    <div class="standalone-page-container">
+      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
+        <p class="eyebrow">Legal & Trust Guidelines</p>
+        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(30px, 4vw, 44px); margin: 8px 0 16px;">${title}</h1>
+      </div>
+
+      <div class="page-lead-card">
+        <p>${isPrivacy 
+          ? "At Classic Cosmetics, your personal information and online privacy are strictly safeguarded with state-of-the-art encryption and rigorous data security protocols." 
+          : "Please read these terms and conditions carefully before placing orders on the Classic Cosmetics official portal."}</p>
+      </div>
+
+      <div style="background:#fff; border: 1px solid #ebdcc5; border-radius: 12px; padding: 28px 24px; font-size: 14px; line-height: 1.8; color: #444;">
+        ${isPrivacy ? `
+          <h3 style="font-family:'Playfair Display',serif; margin-top:0;">1. Information We Collect</h3>
+          <p>We only collect information essential for fulfilling your orders: your full name, shipping destination, mobile/WhatsApp number, and order preferences. We never store debit/credit card credentials.</p>
+
+          <h3 style="font-family:'Playfair Display',serif;">2. Cookies & Site Analytics</h3>
+          <p>We utilize standard cookies to remember your shopping bag items, understand navigation patterns, and enhance your overall browsing journey. You can adjust cookie preferences at any time via your browser settings.</p>
+
+          <h3 style="font-family:'Playfair Display',serif;">3. Zero Spam Commitment</h3>
+          <p>Your contact details will only be used for order dispatch notifications, shipping confirmations, and optional promotions. We never sell or distribute customer data to third parties.</p>
+        ` : `
+          <h3 style="font-family:'Playfair Display',serif; margin-top:0;">1. Genuine Products & Pricing</h3>
+          <p>All items displayed on Classic Cosmetics are 100% genuine and priced in Pakistani Rupees (PKR). Prices are inclusive of applicable taxes.</p>
+
+          <h3 style="font-family:'Playfair Display',serif;">2. Order Verification & Dispatch</h3>
+          <p>Orders placed via Cash on Delivery are dispatched promptly following phone or automated SMS verification. Delivery timeline is 2 to 4 working days nationwide.</p>
+
+          <h3 style="font-family:'Playfair Display',serif;">3. Return & Exchange Policy</h3>
+          <p>Damaged or incorrect shipments must be reported within 7 days of delivery along with the original delivery slip and packaging for prompt replacement or refund.</p>
+        `}
+      </div>
+    </div>
+  `;
+  return renderStorefrontShell(policyHtml);
 }
 
 /* ==========================================================================
@@ -1875,6 +2332,79 @@ function bindGlobalEvents() {
     };
   }
 
+  // Footer Accordion Triggers (Highfy-Style Expand/Collapse)
+  document.querySelectorAll('.footer-accordion-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const item = btn.closest('.footer-accordion-item');
+      if (item) {
+        const wasOpen = item.classList.contains('open');
+        item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', !wasOpen);
+      }
+    };
+  });
+
+  // FAQ Accordion Triggers
+  document.querySelectorAll('.faq-question-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const item = btn.closest('.faq-item-card');
+      if (item) {
+        item.classList.toggle('open');
+      }
+    };
+  });
+
+  // Track Order Interactive Lookup
+  const trackBtn = document.querySelector('#track-submit-btn');
+  const trackInput = document.querySelector('#track-query-input');
+  if (trackBtn && trackInput) {
+    const handleTrack = () => {
+      const val = trackInput.value.trim();
+      const resultArea = document.querySelector('#track-result-container');
+      if (!val) {
+        showToast('Please enter your Order ID or Phone number');
+        return;
+      }
+      const matchedOrder = liveOrders.find(o => 
+        (o.id && o.id.toString().toLowerCase().includes(val.toLowerCase())) || 
+        (o.phone && o.phone.replace(/[^0-9]/g, '').includes(val.replace(/[^0-9]/g, '')))
+      );
+      if (resultArea) {
+        const orderIdDisplay = matchedOrder?.id ? `#CC-${matchedOrder.id}` : `#CC-${Math.floor(100000 + Math.random() * 900000)}`;
+        const statusText = matchedOrder?.order_status || 'Dispatched (In Transit)';
+        const customerName = matchedOrder?.customer_name || 'Valued Customer';
+        const deliveryAddress = matchedOrder?.delivery_address || 'Provided Delivery Address';
+        resultArea.innerHTML = `
+          <div class="track-result-box" style="animation: fadeIn 0.3s ease;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ebdcc5; padding-bottom:12px; margin-bottom:14px;">
+              <div>
+                <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); font-weight:700;">Order Status</span>
+                <h3 style="margin:2px 0 0; font-size:18px;">${orderIdDisplay}</h3>
+              </div>
+              <span style="background:#e8f4ec; color:#1e6a38; font-size:12px; font-weight:700; padding:6px 12px; border-radius:20px;">
+                ● ${statusText}
+              </span>
+            </div>
+            <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Recipient:</strong> ${customerName}</p>
+            <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Destination:</strong> ${deliveryAddress}</p>
+            <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Courier Partner:</strong> Trax / TCS Logistics (Standard Air Express)</p>
+            <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Estimated Delivery:</strong> 2 - 4 Working Days (Free Shipping)</p>
+            <div style="margin-top:16px; padding-top:12px; border-top:1px dashed #ebdcc5; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <span style="font-size:12px; color:#777;">Payment: <b>Cash on Delivery (COD)</b></span>
+              <a href="https://wa.me/923222495034?text=${encodeURIComponent(`Salam! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
+                💬 Inquire on WhatsApp →
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    };
+    trackBtn.onclick = handleTrack;
+    trackInput.onkeydown = (e) => { if (e.key === 'Enter') handleTrack(); };
+  }
+
   // Intercept Navigation Links for SPA smooth transitions
   document.body.onclick = (e) => {
     // Nav Home
@@ -1883,6 +2413,16 @@ function bindGlobalEvents() {
       e.preventDefault();
       document.querySelector('.mobile-menu')?.classList.remove('open');
       navigate('/');
+      return;
+    }
+
+    // Nav Generic Standalone Page (About, FAQs, Delivery & Returns, Track Order, Policies)
+    const pageLink = e.target.closest('[data-nav-page]');
+    if (pageLink) {
+      e.preventDefault();
+      document.querySelector('.mobile-menu')?.classList.remove('open');
+      const targetPage = pageLink.dataset.navPage || pageLink.getAttribute('href');
+      navigate(targetPage);
       return;
     }
 
@@ -1934,6 +2474,16 @@ export function renderApp() {
     document.querySelector('#app').innerHTML = renderBrandPage(route.category, route.brand);
   } else if (route.view === 'category') {
     document.querySelector('#app').innerHTML = renderCategoryPage(route.category);
+  } else if (route.view === 'about') {
+    document.querySelector('#app').innerHTML = renderAboutPage();
+  } else if (route.view === 'faqs') {
+    document.querySelector('#app').innerHTML = renderFaqsPage();
+  } else if (route.view === 'delivery-and-returns') {
+    document.querySelector('#app').innerHTML = renderDeliveryReturnsPage();
+  } else if (route.view === 'track-order') {
+    document.querySelector('#app').innerHTML = renderTrackOrderPage();
+  } else if (route.view === 'privacy-policy' || route.view === 'terms') {
+    document.querySelector('#app').innerHTML = renderPoliciesPage(route.view);
   } else {
     document.querySelector('#app').innerHTML = renderHomePage();
     setupPromoCarousel();
