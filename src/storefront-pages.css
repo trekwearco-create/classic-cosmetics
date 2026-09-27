@@ -951,3 +951,302 @@
   margin-top: 20px;
 }
 
+/* ==========================================================================
+   MOBILE HAMBURGER MENU — Premium Redesign
+   ========================================================================== */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: min(360px, 88%);
+  max-width: 100%;
+  height: 100dvh;
+  background: linear-gradient(180deg, #fdfaf6 0%, #f7f1e7 100%);
+  z-index: 200;
+  transform: translateX(-105%);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+.mobile-menu.open {
+  transform: translateX(0);
+}
+.mobile-menu.open ~ .overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Header */
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 16px;
+  background: linear-gradient(135deg, #221f1b 0%, #3a3229 100%);
+  border-bottom: 2px solid rgba(198, 166, 100, 0.35);
+  position: relative;
+  flex-shrink: 0;
+}
+.mobile-menu-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 20px;
+  right: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #c6a664, transparent);
+}
+.mobile-menu-logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.78;
+  text-align: left;
+}
+.mobile-menu-logo span {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #fdfaf6;
+  letter-spacing: 0.17em;
+}
+.mobile-menu-logo em {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: #c6a664;
+  font-weight: 500;
+  font-style: italic;
+  margin-top: 4px;
+}
+.close-menu {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f5dfaf;
+  display: grid;
+  place-items: center;
+  transition: all 0.22s ease;
+  cursor: pointer;
+}
+.close-menu:hover {
+  background: #c6a664;
+  border-color: #c6a664;
+  color: #221f1b;
+  transform: rotate(90deg);
+}
+.close-menu:active {
+  transform: rotate(90deg) scale(0.92);
+}
+
+/* Body */
+.mobile-menu-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(198, 166, 100, 0.45) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-menu-body::-webkit-scrollbar {
+  width: 4px;
+}
+.mobile-menu-body::-webkit-scrollbar-thumb {
+  background: rgba(198, 166, 100, 0.5);
+  border-radius: 4px;
+}
+
+/* Sections */
+.mobile-menu-section {
+  margin-bottom: 18px;
+  animation: menuFadeIn 0.5s ease both;
+}
+.mobile-menu-section:nth-child(1) { animation-delay: 0.06s; }
+.mobile-menu-section:nth-child(2) { animation-delay: 0.12s; }
+.mobile-menu-section:nth-child(3) { animation-delay: 0.18s; }
+.mobile-menu-section:nth-child(4) { animation-delay: 0.24s; }
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.mobile-menu-section-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 4px 10px;
+}
+.mobile-menu-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c6a664, #e4c98e);
+  box-shadow: 0 0 0 3px rgba(198, 166, 100, 0.15);
+}
+.mobile-menu-section-head .eyebrow {
+  margin: 0;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: #8a7754;
+  font-weight: 700;
+}
+
+/* Menu Items */
+.mobile-menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.mobile-menu-item {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 12px 12px 11px;
+  background: #fff;
+  border-radius: 13px;
+  border: 1px solid #ece3d3;
+  text-decoration: none;
+  color: var(--ink);
+  transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+.mobile-menu-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(198, 166, 100, 0.09), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.mobile-menu-item:hover,
+.mobile-menu-item:active {
+  border-color: #c6a664;
+  transform: translateX(4px);
+  box-shadow: 0 8px 22px rgba(198, 166, 100, 0.18);
+}
+.mobile-menu-item:hover::before,
+.mobile-menu-item:active::before {
+  opacity: 1;
+}
+.mobile-menu-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+.mobile-menu-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+.mobile-menu-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #221f1b;
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+}
+.mobile-menu-text span {
+  font-size: 11px;
+  color: #8c8275;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mobile-menu-arrow {
+  font-size: 22px;
+  color: #c6a664;
+  font-weight: 300;
+  line-height: 1;
+  transform: translateX(-3px);
+  transition: all 0.22s ease;
+  position: relative;
+  z-index: 1;
+}
+.mobile-menu-item:hover .mobile-menu-arrow,
+.mobile-menu-item:active .mobile-menu-arrow {
+  transform: translateX(2px);
+  color: #8a7238;
+}
+
+/* Footer WhatsApp Card */
+.mobile-menu-footer {
+  padding: 14px 14px 18px;
+  background: #fff;
+  border-top: 1px solid #ece3d3;
+  flex-shrink: 0;
+}
+.mobile-menu-whatsapp {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: linear-gradient(135deg, #25d366 0%, #1ebe5b 100%);
+  border-radius: 13px;
+  text-decoration: none;
+  color: #fff;
+  transition: all 0.22s ease;
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.25);
+}
+.mobile-menu-whatsapp:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(37, 211, 102, 0.32);
+}
+.mobile-menu-whatsapp:active {
+  transform: translateY(0) scale(0.98);
+}
+.wa-badge-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(6px);
+}
+.mobile-menu-whatsapp div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.mobile-menu-whatsapp strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+.mobile-menu-whatsapp span {
+  font-size: 11px;
+  opacity: 0.92;
+  font-weight: 500;
+}
+
+/* Show menu button on mobile */
+@media (max-width: 760px) {
+  .menu-button {
+    display: flex !important;
+  }
+}
+

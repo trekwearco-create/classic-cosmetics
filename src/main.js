@@ -426,12 +426,174 @@ function renderStorefrontShell(mainContentHtml) {
       </div>
     </header>
 
-    <aside class="mobile-menu">
-      <button class="close-menu" aria-label="Close menu">×</button>
-      <p class="eyebrow">Explore</p>
-      <a href="/" data-nav-home="true">Home</a>
-      ${categories.map(cat => `<a href="/category/${slugify(cat)}" data-nav-category="${cat}">${cat}</a>`).join('')}
-      <a href="/admin">Admin Portal</a>
+    <aside class="mobile-menu" aria-hidden="true">
+      <div class="mobile-menu-header">
+        <div class="mobile-menu-logo">
+          <span>CLASSIC</span><em>cosmetics</em>
+        </div>
+        <button class="close-menu" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mobile-menu-body">
+        <div class="mobile-menu-section">
+          <div class="mobile-menu-section-head">
+            <span class="mobile-menu-dot"></span>
+            <p class="eyebrow">Main Menu</p>
+          </div>
+          <nav class="mobile-menu-nav">
+            <a href="/" data-nav-home="true" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#c6a664,#e4d4b8);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>Home</strong>
+                <span>Main storefront</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="mobile-menu-section">
+          <div class="mobile-menu-section-head">
+            <span class="mobile-menu-dot"></span>
+            <p class="eyebrow">Categories</p>
+          </div>
+          <nav class="mobile-menu-nav">
+            ${categories.map(cat => {
+              const catIcons = {
+                'Skincare': { grad: 'linear-gradient(135deg,#f8c8dc,#f4a8c0)', icon: 'M12 2a6 6 0 0 1 6 6c0 2-2 3-2 5s1 2 1 3a3 3 0 0 1-6 0c0-1 1-2 1-3s-2-3-2-5a6 6 0 0 1 6-6z' },
+                'Makeup': { grad: 'linear-gradient(135deg,#f5d76e,#f0932b)', icon: 'M12 19l7-7 3 3-7 7-3-3zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5zM2 2l7.586 7.586M11 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' },
+                'Fragrance': { grad: 'linear-gradient(135deg,#a29bfe,#6c5ce7)', icon: 'M10 16v4a2 2 0 0 0 4 0v-4M9 2h6l2 4h0a3 3 0 0 1 0 6v2a4 4 0 0 1-8 0v-8a3 3 0 0 1 0-6l2-4z' },
+                'Bath & Body': { grad: 'linear-gradient(135deg,#55efc4,#00b894)', icon: 'M7 20h10M9 20V6a3 3 0 0 1 6 0v14M6 10h12' }
+              };
+              const cfg = catIcons[cat] || { grad: 'linear-gradient(135deg,#c6a664,#e4d4b8)', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' };
+              return \`
+                <a href="/category/\${slugify(cat)}" data-nav-category="\${cat}" class="mobile-menu-item">
+                  <span class="mobile-menu-icon" style="background: \${cfg.grad};">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="\${cfg.icon}"></path>
+                    </svg>
+                  </span>
+                  <div class="mobile-menu-text">
+                    <strong>\${cat}</strong>
+                    <span>Shop \${cat.toLowerCase()} collection</span>
+                  </div>
+                  <span class="mobile-menu-arrow">›</span>
+                </a>
+              \`;
+            }).join('')}
+          </nav>
+        </div>
+
+        <div class="mobile-menu-section">
+          <div class="mobile-menu-section-head">
+            <span class="mobile-menu-dot"></span>
+            <p class="eyebrow">Help & Support</p>
+          </div>
+          <nav class="mobile-menu-nav">
+            <a href="/track-order" data-nav-page="/track-order" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#74b9ff,#0984e3);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>Track Order</strong>
+                <span>Check your order status</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+            <a href="/faqs" data-nav-page="/faqs" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#fdcb6e,#f39c12);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>FAQ's</strong>
+                <span>Find quick answers</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+            <a href="/delivery-and-returns" data-nav-page="/delivery-and-returns" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#81ecec,#00cec9);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>Delivery & Returns</strong>
+                <span>Shipping & exchange policy</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+            <a href="/about" data-nav-page="/about" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#fab1a0,#e17055);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>About Us</strong>
+                <span>Our brand story</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="mobile-menu-section">
+          <div class="mobile-menu-section-head">
+            <span class="mobile-menu-dot"></span>
+            <p class="eyebrow">Admin Access</p>
+          </div>
+          <nav class="mobile-menu-nav">
+            <a href="/admin" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#2d3436,#636e72);">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <div class="mobile-menu-text">
+                <strong>Admin Portal</strong>
+                <span>Manage store & orders</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <div class="mobile-menu-footer">
+        <a class="mobile-menu-whatsapp" href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">
+          <span class="wa-badge-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" stroke="#fff" stroke-width="1">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
+            </svg>
+          </span>
+          <div>
+            <strong>Chat with us</strong>
+            <span>+92 322 2495034</span>
+          </div>
+        </a>
+      </div>
     </aside>
 
     <main id="main-content">
@@ -762,6 +924,44 @@ function renderHomePage() {
 
     <!-- User-Created Custom Sections (Dynamic) -->
     ${sectionsHtml}
+
+    <!-- Dynamic Available Brands Section (Admin Managed) -->
+    <section class="featured" id="brands">
+      <div class="section-heading row-heading shop-header-bar">
+        <div>
+          <p class="eyebrow">Our Partners</p>
+          <h2>Available Brands</h2>
+        </div>
+        <div class="shop-filter-meta">
+          <span class="product-counter">${brands.length} brand${brands.length === 1 ? '' : 's'}</span>
+        </div>
+      </div>
+
+      ${brands.length > 0 ? `
+        <div class="brand-tiles-grid">
+          ${brands.map(b => {
+            const count = products.filter(p => (p.brand || '').toLowerCase() === b.name.toLowerCase()).length;
+            const initial = (b.name || 'B').charAt(0).toUpperCase();
+            const brandCat = b.category || '';
+            return \`
+              <a class="brand-tile-card" href="/category/\${slugify(brandCat)}/brand/\${slugify(b.name)}" data-nav-brand-category="\${brandCat}" data-nav-brand-name="\${b.name}">
+                <div class="brand-tile-avatar">\${initial}</div>
+                <strong class="brand-tile-name">\${b.name}</strong>
+                <span class="brand-tile-count">\${brandCat ? brandCat + ' · ' : ''}\${count} product\${count === 1 ? '' : 's'}</span>
+                <span class="brand-tile-cta">Shop Brand →</span>
+              </a>
+            \`;
+          }).join('')}
+        </div>
+      ` : \`
+        <div class="empty-search-state" style="margin-top:20px;">
+          <div class="empty-icon">🏷️</div>
+          <h3>No brands added yet</h3>
+          <p>Brands will appear here once added from the Admin Portal.</p>
+          <a class="button reset-search-btn" href="/admin" style="color:#fff;text-decoration:none;">Add Brands in Admin <span>→</span></a>
+        </div>
+      \`}
+    </section>
 
     <!-- Main Storefront Catalogue -->
     <section class="featured" id="shop">
@@ -2243,15 +2443,22 @@ function bindGlobalEvents() {
   document.querySelectorAll('.close-cart, .overlay').forEach(btn => {
     btn.onclick = () => {
       document.querySelector('.cart-panel')?.classList.remove('open');
+      document.querySelector('.mobile-menu')?.classList.remove('open');
+      const menu = document.querySelector('.mobile-menu');
+      if (menu) menu.setAttribute('aria-hidden', 'true');
     };
   });
 
   // Mobile menu
   document.querySelector('.menu-button')?.addEventListener('click', () => {
-    document.querySelector('.mobile-menu')?.classList.add('open');
+    const menu = document.querySelector('.mobile-menu');
+    menu?.classList.add('open');
+    if (menu) menu.setAttribute('aria-hidden', 'false');
   });
   document.querySelector('.close-menu')?.addEventListener('click', () => {
-    document.querySelector('.mobile-menu')?.classList.remove('open');
+    const menu = document.querySelector('.mobile-menu');
+    menu?.classList.remove('open');
+    if (menu) menu.setAttribute('aria-hidden', 'true');
   });
 
   // Cart item remove
