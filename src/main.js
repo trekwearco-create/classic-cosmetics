@@ -645,7 +645,7 @@ function renderStorefrontShell(mainContentHtml) {
               </a>
               <div class="footer-contact-row" style="color:#666;">
                 <span class="footer-contact-icon">📍</span>
-                <span>DHA Phase 5, Lahore, Pakistan</span>
+                <span>Plot R41, Hussainabad, F.B. Area, Block 2, Gulberg Town, Karachi, Pakistan</span>
               </div>
             </div>
           </div>
