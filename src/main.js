@@ -4,15 +4,21 @@ import './admin-management.css';
 import { supabase, supabaseConfigured } from './supabase.js';
 
 const defaultProducts = [
-  { id: 'rose-serum', name: 'Rose Renewal Serum', type: 'Skincare', price: 2490, originalPrice: 3890, rating: 4.9, reviews: 42, shade: 'rose', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=700&q=85' },
-  { id: 'silk-foundation', name: 'Silk Veil Foundation', type: 'Makeup', price: 1890, originalPrice: 2700, rating: 4.8, reviews: 29, shade: 'sand', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=85' },
-  { id: 'gold-elixir', name: 'Golden Glow Elixir', type: 'Skincare', price: 2790, originalPrice: 4200, rating: 4.9, reviews: 58, shade: 'gold', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=700&q=85' },
-  { id: 'velvet-lip', name: 'Velvet Petal Lip Color', type: 'Makeup', price: 1290, originalPrice: 1990, rating: 4.9, reviews: 88, shade: 'berry', image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=700&q=85' },
-  { id: 'midnight-musk', name: 'Midnight Musk Eau de Parfum', type: 'Fragrance', price: 3490, originalPrice: 4990, rating: 5.0, reviews: 19, shade: 'ink', image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=700&q=85' },
-  { id: 'botanical-wash', name: 'Botanical Cleansing Balm', type: 'Bath & Body', price: 1590, originalPrice: 2250, rating: 4.8, reviews: 33, shade: 'leaf', image: 'https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&w=700&q=85' }
+  { id: 'rose-serum', name: 'Rose Renewal Serum', type: 'Skincare', brand: 'Garnier', price: 2490, originalPrice: 3890, rating: 4.9, reviews: 42, shade: 'rose', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=700&q=85' },
+  { id: 'silk-foundation', name: 'Silk Veil Foundation', type: 'Makeup', brand: 'Maybelline', price: 1890, originalPrice: 2700, rating: 4.8, reviews: 29, shade: 'sand', image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=85' },
+  { id: 'gold-elixir', name: 'Golden Glow Elixir', type: 'Skincare', brand: 'The Ordinary', price: 2790, originalPrice: 4200, rating: 4.9, reviews: 58, shade: 'gold', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=700&q=85' },
+  { id: 'velvet-lip', name: 'Velvet Petal Lip Color', type: 'Makeup', brand: "L'Oréal Paris", price: 1290, originalPrice: 1990, rating: 4.9, reviews: 88, shade: 'berry', image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=700&q=85' },
+  { id: 'midnight-musk', name: 'Midnight Musk Eau de Parfum', type: 'Fragrance', brand: 'Classic', price: 3490, originalPrice: 4990, rating: 5.0, reviews: 19, shade: 'ink', image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=700&q=85' },
+  { id: 'botanical-wash', name: 'Botanical Cleansing Balm', type: 'Bath & Body', brand: 'CeraVe', price: 1590, originalPrice: 2250, rating: 4.8, reviews: 33, shade: 'leaf', image: 'https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&w=700&q=85' }
 ];
 
-let products = JSON.parse(localStorage.getItem('classic-products') || 'null') || defaultProducts;
+let products = (JSON.parse(localStorage.getItem('classic-products') || 'null') || defaultProducts).map(p => {
+  if (!p.brand) {
+    const match = defaultProducts.find(dp => dp.id === p.id || dp.name === p.name);
+    if (match?.brand) return { ...p, brand: match.brand };
+  }
+  return p;
+});
 
 let cart = JSON.parse(localStorage.getItem('classic-cart') || '[]');
 let liveOrders = [];
@@ -76,7 +82,10 @@ function productCard(product) {
         </button>
       </div>
       <div class="product-card-body">
-        <span class="product-category-tag">${product.type}</span>
+        <div class="product-meta-row">
+          <span class="product-category-tag">${product.type}</span>
+          ${(product.brand || product.brands?.name) ? `<span class="product-brand-tag">${product.brand || product.brands?.name}</span>` : ''}
+        </div>
         <h3 class="product-name-heading" data-details="${product.id}" title="${product.name}">${product.name}</h3>
         <div class="product-rating-row">
           <span class="stars-gold">★★★★★</span>
@@ -398,16 +407,62 @@ function render() {
         <p>— AREEBA K., LAHORE</p>
       </section>
 
-      <section class="newsletter" id="contact">
-        <div>
-          <p class="eyebrow">A note from us</p>
-          <h2>Be first to know</h2>
-          <p>New arrivals, quiet offers and beauty notes — just the lovely bits.</p>
+      <section class="contact-section" id="contact">
+        <div class="contact-inner">
+          <div class="contact-info-col">
+            <p class="eyebrow">Get in touch</p>
+            <h2>Contact <i>Us</i></h2>
+            <p class="contact-sub">Hamara team hamesha available hai aapki madad ke liye. Kisi bhi product ya order ke baare mein seedha rabta karein.</p>
+
+            <div class="contact-items">
+              <a class="contact-item" href="tel:+923151247533" aria-label="Call +92 315 1247533">
+                <div class="contact-icon">📞</div>
+                <div class="contact-text">
+                  <strong>Phone / WhatsApp</strong>
+                  <span>+92 315 1247533</span>
+                </div>
+              </a>
+              <a class="contact-item" href="tel:+923222495034" aria-label="Call +92 322 2495034">
+                <div class="contact-icon">📞</div>
+                <div class="contact-text">
+                  <strong>Phone / WhatsApp</strong>
+                  <span>+92 322 2495034</span>
+                </div>
+              </a>
+              <a class="contact-item" href="https://www.instagram.com/classic.cosmetic.pk" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <div class="contact-icon">📸</div>
+                <div class="contact-text">
+                  <strong>Instagram</strong>
+                  <span>@classic.cosmetic.pk</span>
+                </div>
+              </a>
+              <a class="contact-item" href="https://www.facebook.com/classic.cosmetics.pk" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                <div class="contact-icon">👍</div>
+                <div class="contact-text">
+                  <strong>Facebook</strong>
+                  <span>classic.cosmetics.pk</span>
+                </div>
+              </a>
+              <a class="contact-item" href="https://goo.gl/maps/U9VZDdDe3MHAbBfW9" target="_blank" rel="noopener noreferrer" aria-label="Location on Google Maps">
+                <div class="contact-icon">📍</div>
+                <div class="contact-text">
+                  <strong>Location</strong>
+                  <span>View on Google Maps →</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="contact-newsletter-col">
+            <p class="eyebrow">A note from us</p>
+            <h3>Be first to know</h3>
+            <p>New arrivals, quiet offers and beauty notes — just the lovely bits.</p>
+            <form id="newsletter-form" class="newsletter-form-inline">
+              <input type="email" required placeholder="Your email address" aria-label="Email address" />
+              <button class="button" type="submit">Subscribe <span>→</span></button>
+            </form>
+          </div>
         </div>
-        <form id="newsletter-form">
-          <input type="email" required placeholder="Your email address" aria-label="Email address" />
-          <button class="button" type="submit">Subscribe <span>→</span></button>
-        </form>
       </section>
     </main>
 
@@ -665,13 +720,14 @@ async function hydrateStorefront() {
   if (!supabaseConfigured) return;
   const [{ data: categoryData }, { data: productData }] = await Promise.all([
     supabase.from('categories').select('name').order('created_at'),
-    supabase.from('products').select('*, categories(name)').eq('status', 'in_stock').order('created_at', { ascending: false })
+    supabase.from('products').select('*, categories(name), brands(name)').eq('status', 'in_stock').order('created_at', { ascending: false })
   ]);
   if (categoryData?.length) categories = categoryData.map(category => category.name);
   if (productData?.length) products = productData.map(product => ({ 
     ...product, 
     type: product.categories?.name || 'Uncategorized', 
-    image: product.images?.[0] || '',
+    brand: product.brands?.name || product.brand || '',
+    image: product.images?.[0] || product.image || '',
     originalPrice: product.compare_at_price || product.original_price || (product.price ? Math.round(Number(product.price) * 1.35) : 0),
     rating: product.rating || 4.8,
     reviews: product.reviews || 28
@@ -683,6 +739,7 @@ function subscribeToCatalogue() {
   if (!supabaseConfigured || catalogueChannel) return;
   catalogueChannel = supabase.channel('storefront-catalogue-live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, hydrateStorefront)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'brands' }, hydrateStorefront)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, hydrateStorefront)
     .subscribe();
 }
@@ -849,10 +906,29 @@ async function submitOrder(event) {
 }
 
 async function fetchOrders() {
-  if (!supabaseConfigured) return;
+  // Always load from localStorage first as immediate UI (fallback)
+  if (!ordersLoaded) {
+    const local = JSON.parse(localStorage.getItem('classic-orders') || '[]');
+    if (local.length) { liveOrders = local; }
+  }
+  if (!supabaseConfigured) {
+    ordersLoaded = true;
+    const activeForm = document.activeElement?.closest('#product-form, #category-form, #checkout-form');
+    if (!activeForm) renderAdmin();
+    return;
+  }
   const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
-  if (!error) {
-    liveOrders = data;
+  if (!error && data) {
+    // Merge Supabase orders with any local-only orders (placed offline)
+    const supaIds = new Set(data.map(o => o.id));
+    const localOnly = liveOrders.filter(o => !o.id || !supaIds.has(o.id));
+    liveOrders = [...localOnly, ...data];
+    ordersLoaded = true;
+    const activeForm = document.activeElement?.closest('#product-form, #category-form, #checkout-form');
+    if (!activeForm) renderAdmin();
+  } else if (error) {
+    console.warn('fetchOrders error:', error.message);
+    // Still update UI with whatever we have
     ordersLoaded = true;
     const activeForm = document.activeElement?.closest('#product-form, #category-form, #checkout-form');
     if (!activeForm) renderAdmin();
@@ -863,18 +939,30 @@ function subscribeToOrders() {
   if (!supabaseConfigured || ordersChannel) return;
   ordersChannel = supabase.channel('admin-orders-live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
-      if (payload.eventType === 'DELETE') liveOrders = liveOrders.filter(order => order.id !== payload.old.id);
-      else { const index = liveOrders.findIndex(order => order.id === payload.new.id); if (index >= 0) liveOrders[index] = payload.new; else liveOrders.unshift(payload.new); }
+      if (payload.eventType === 'DELETE') {
+        liveOrders = liveOrders.filter(order => order.id !== payload.old.id);
+      } else {
+        const index = liveOrders.findIndex(order => order.id === payload.new.id);
+        if (index >= 0) liveOrders[index] = payload.new;
+        else liveOrders.unshift(payload.new);
+      }
       ordersLoaded = true;
       if (window.location.pathname.startsWith('/admin') && !document.activeElement?.closest('form')) renderAdmin();
-    }).subscribe();
+    })
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') console.log('✓ Orders realtime active');
+      if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+        console.warn('Realtime channel issue, relying on polling fallback.');
+      }
+    });
 }
 
 function startOrdersPolling() {
-  if (!supabaseConfigured || ordersPoller) return;
+  if (ordersPoller) return; // already running, don't create duplicate
+  // Poll every 8 seconds regardless of Supabase — catches offline orders & realtime gaps
   ordersPoller = window.setInterval(() => {
     if (!document.activeElement?.closest('form')) fetchOrders();
-  }, 10000);
+  }, 8000);
 }
 
 async function updateOrderStatus(id, status) {
@@ -894,7 +982,23 @@ const orders = [
 let adminView = 'overview';
 let managementLoaded = false;
 let categories = JSON.parse(localStorage.getItem('classic-categories') || 'null') || ['Skincare', 'Makeup', 'Fragrance', 'Bath & Body'];
-let brands = JSON.parse(localStorage.getItem('classic-brands') || 'null') || [];
+
+const defaultBrands = [
+  { id: 'b-garnier', name: 'Garnier', category: 'Skincare' },
+  { id: 'b-ordinary', name: 'The Ordinary', category: 'Skincare' },
+  { id: 'b-cerave', name: 'CeraVe', category: 'Skincare' },
+  { id: 'b-nivea', name: 'Nivea', category: 'Skincare' },
+  { id: 'b-maybelline', name: 'Maybelline', category: 'Makeup' },
+  { id: 'b-loreal', name: "L'Oréal Paris", category: 'Makeup' },
+  { id: 'b-huda', name: 'Huda Beauty', category: 'Makeup' },
+  { id: 'b-chanel', name: 'Chanel', category: 'Fragrance' },
+  { id: 'b-dior', name: 'Dior', category: 'Fragrance' },
+  { id: 'b-bathbody', name: 'Bath & Body Works', category: 'Bath & Body' }
+];
+
+let brands = JSON.parse(localStorage.getItem('classic-brands') || 'null') || defaultBrands;
+if (!brands.length) brands = defaultBrands;
+
 let managedProducts = JSON.parse(localStorage.getItem('classic-products') || 'null') || products.map(product => ({ ...product, description: '' }));
 const saveAdminData = () => { localStorage.setItem('classic-categories', JSON.stringify(categories)); localStorage.setItem('classic-brands', JSON.stringify(brands)); localStorage.setItem('classic-products', JSON.stringify(managedProducts)); };
 const slugify = value => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -903,7 +1007,8 @@ async function syncManagementData() {
   if (!supabaseConfigured) return;
   const [{ data: categoryData }, { data: brandData }, { data: productData }] = await Promise.all([supabase.from('categories').select('*').order('name'), supabase.from('brands').select('*, categories(name)').order('name'), supabase.from('products').select('*, categories(name), brands(name)').order('created_at', { ascending: false })]);
   if (categoryData?.length) categories = categoryData.map(category => category.name);
-  if (brandData) brands = brandData.map(brand => ({ id: brand.id, name: brand.name, category: brand.categories?.name || '' }));
+  if (brandData?.length) brands = brandData.map(brand => ({ id: brand.id, name: brand.name, category: brand.categories?.name || '' }));
+  if (!brands.length) brands = defaultBrands;
   if (productData?.length) managedProducts = productData.map(product => ({ ...product, type: product.categories?.name || 'Uncategorized', brand: product.brands?.name || '', image: product.images?.[0] || '' }));
   managementLoaded = true; saveAdminData();
   if (!document.activeElement?.closest('form')) renderAdmin();
@@ -915,21 +1020,45 @@ function ordersView(displayedOrders) {
 
 function mountBrandControls() {
   const productForm = document.querySelector('#product-form');
-  if (productForm && !productForm.elements.brand) {
+  if (productForm) {
     const categoryLabel = productForm.elements.category.closest('label');
+    const existingBrandLabel = productForm.querySelector('#brand-label') || productForm.elements.brand?.closest('label');
+    if (existingBrandLabel) existingBrandLabel.remove();
+
+    const currentCategory = productForm.elements.category.value;
     const label = document.createElement('label');
-    label.innerHTML = `Brand<select name="brand"><option value="">No brand</option>${brands.filter(brand => brand.category === productForm.elements.category.value).map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}</select>`;
+    label.id = 'brand-label';
+    const brandsForCategory = brands.filter(b => (b.category || '').trim().toLowerCase() === (currentCategory || '').trim().toLowerCase());
+    label.innerHTML = `Brand<select name="brand"><option value="">No brand</option>${brandsForCategory.map(b => `<option value="${b.name}">${b.name}</option>`).join('')}</select>`;
+    if (brandsForCategory.length === 0 && brands.length > 0) {
+      const hint = document.createElement('small');
+      hint.style.cssText = 'color:#888;font-size:11px;margin-top:4px;display:block';
+      hint.textContent = `No brands added for "${currentCategory}" yet. Add them in Categories tab.`;
+      label.append(hint);
+    }
     categoryLabel.insertAdjacentElement('afterend', label);
-    productForm.elements.category.addEventListener('change', () => {
+
+    productForm.elements.category.onchange = () => {
       const selected = productForm.elements.category.value;
-      productForm.elements.brand.innerHTML = `<option value="">No brand</option>${brands.filter(brand => brand.category === selected).map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}`;
-    });
+      const brandsForSel = brands.filter(b => (b.category || '').trim().toLowerCase() === (selected || '').trim().toLowerCase());
+      if (productForm.elements.brand) {
+        productForm.elements.brand.innerHTML = `<option value="">No brand</option>${brandsForSel.map(b => `<option value="${b.name}">${b.name}</option>`).join('')}`;
+      }
+      const existingHint = label.querySelector('small');
+      if (existingHint) existingHint.remove();
+      if (brandsForSel.length === 0 && brands.length > 0) {
+        const hint = document.createElement('small');
+        hint.style.cssText = 'color:#888;font-size:11px;margin-top:4px;display:block';
+        hint.textContent = `No brands added for "${selected}" yet. Add them in Categories tab.`;
+        label.append(hint);
+      }
+    };
   }
   const categoriesPanel = document.querySelector('#category-form')?.closest('.admin-card');
   if (categoriesPanel && !document.querySelector('#brand-form')) {
     const panel = document.createElement('div');
     panel.className = 'brand-manager';
-    panel.innerHTML = `<p class="eyebrow">Sub-categories</p><h2>Brands</h2><form id="brand-form" class="manager-form"><label>Category<select name="category">${categories.map(category => `<option>${category}</option>`).join('')}</select></label><input name="name" required placeholder="e.g. Garnier"/><button class="button">Add brand <span>→</span></button></form><div class="manager-list">${brands.length ? brands.map((brand, index) => `<div><span><strong>${brand.name}</strong><small>${brand.category}</small></span><span><button data-rename-brand="${index}">Rename</button><button data-delete-brand="${index}">Delete</button></span></div>`).join('') : '<p class="empty-state">No brands added yet.</p>'}</div>`;
+    panel.innerHTML = `<p class="eyebrow">Sub-categories</p><h2>Brands</h2><form id="brand-form" class="manager-form"><label>Category<select name="category">${categories.map(c => `<option>${c}</option>`).join('')}</select></label><input name="name" required placeholder="e.g. Garnier"/><button class="button">Add brand <span>→</span></button></form><div class="manager-list">${brands.length ? brands.map((brand, index) => `<div><span><strong>${brand.name}</strong><small>${brand.category}</small></span><span><button data-rename-brand="${index}">Rename</button><button data-delete-brand="${index}">Delete</button></span></div>`).join('') : '<p class="empty-state">No brands added yet. Add a category first, then add a brand for it.</p>'}</div>`;
     categoriesPanel.append(panel);
   }
 }
@@ -964,11 +1093,32 @@ function renderAdmin() {
   document.querySelector('.admin-sidebar')?.addEventListener('click', event => { const button = event.target.closest('[data-view]'); if (button) { adminView = button.dataset.view; renderAdmin(); } });
   adminMain?.addEventListener('click', async event => {
     const button = event.target.closest('button'); if (!button) return;
-    if (button.id === 'refresh-orders') return fetchOrders();
+    if (button.id === 'refresh-orders') {
+      button.textContent = '↻ Refreshing…';
+      button.disabled = true;
+      await fetchOrders();
+      button.textContent = '↻ Refresh';
+      button.disabled = false;
+      showToast('Orders refreshed.');
+      return;
+    }
     if (button.dataset.deleteCategory !== undefined) { const name = categories[Number(button.dataset.deleteCategory)]; categories = categories.filter(category => category !== name); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('categories').delete().eq('name', name); }
     if (button.dataset.renameCategory !== undefined) { const index = Number(button.dataset.renameCategory); const oldName = categories[index]; const name = window.prompt('New category name', oldName)?.trim(); if (!name || name === oldName) return; categories[index] = name; managedProducts = managedProducts.map(product => product.type === oldName ? { ...product, type: name } : product); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('categories').update({ name, slug: slugify(name) }).eq('name', oldName); }
     if (button.dataset.deleteProduct !== undefined) { const product = managedProducts[Number(button.dataset.deleteProduct)]; managedProducts.splice(Number(button.dataset.deleteProduct), 1); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('products').delete().eq('id', product.id); }
-    if (button.dataset.editProduct !== undefined) { const product = managedProducts[Number(button.dataset.editProduct)]; const form = document.querySelector('#product-form'); form.elements.imageFile.required = false; Object.entries({ index: button.dataset.editProduct, name: product.name, category: product.type, price: product.price, originalPrice: product.originalPrice || '', shade: product.shade || '', description: product.description || '' }).forEach(([key, value]) => { if (form.elements[key]) form.elements[key].value = value; }); if (form.elements.brand) { form.elements.brand.innerHTML = `<option value="">No brand</option>${brands.filter(brand => brand.category === product.type).map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}`; form.elements.brand.value = product.brand || ''; } document.querySelector('#product-form-title').textContent = `Edit ${product.name}`; form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (button.dataset.editProduct !== undefined) {
+      const product = managedProducts[Number(button.dataset.editProduct)];
+      const form = document.querySelector('#product-form');
+      form.elements.imageFile.required = false;
+      Object.entries({ index: button.dataset.editProduct, name: product.name, category: product.type, price: product.price, originalPrice: product.originalPrice || '', shade: product.shade || '', description: product.description || '' }).forEach(([key, value]) => { if (form.elements[key]) form.elements[key].value = value; });
+      mountBrandControls();
+      if (form.elements.brand) {
+        const brandsForCat = brands.filter(b => (b.category || '').trim().toLowerCase() === (product.type || '').trim().toLowerCase());
+        form.elements.brand.innerHTML = `<option value="">No brand</option>${brandsForCat.map(b => `<option value="${b.name}">${b.name}</option>`).join('')}`;
+        form.elements.brand.value = product.brand || '';
+      }
+      document.querySelector('#product-form-title').textContent = `Edit ${product.name}`;
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     if (button.dataset.deleteBrand !== undefined) { const brand = brands[Number(button.dataset.deleteBrand)]; brands.splice(Number(button.dataset.deleteBrand), 1); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('brands').delete().eq('id', brand.id); }
     if (button.dataset.renameBrand !== undefined) { const index = Number(button.dataset.renameBrand); const oldBrand = brands[index]; const name = window.prompt('New brand name', oldBrand.name)?.trim(); if (!name || name === oldBrand.name) return; brands[index] = { ...oldBrand, name }; managedProducts = managedProducts.map(product => product.brand === oldBrand.name ? { ...product, brand: name } : product); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('brands').update({ name }).eq('id', oldBrand.id); }
   });
@@ -979,9 +1129,20 @@ function renderAdmin() {
     if (supabaseConfigured) { const { error } = await supabase.from('categories').upsert({ name, slug: slugify(name) }); if (error) showToast(`Category saved locally: ${error.message}`); }
   });
   document.querySelector('#brand-form')?.addEventListener('submit', async event => {
-    event.preventDefault(); const form = new FormData(event.currentTarget); const category = form.get('category'); const name = form.get('name').trim(); if (!name || brands.some(brand => brand.category === category && brand.name === name)) return;
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const category = form.get('category');
+    const name = form.get('name').trim();
+    if (!name || brands.some(b => b.category === category && b.name === name)) return;
     let brand = { id: crypto.randomUUID(), name, category };
-    if (supabaseConfigured) { const { data: categoryRow } = await supabase.from('categories').select('id').eq('name', category).single(); const { data, error } = await supabase.from('brands').insert({ name, category_id: categoryRow?.id }).select().single(); if (error) return showToast(`Brand save failed: ${error.message}`); brand.id = data.id; }
+    if (supabaseConfigured) {
+      const { data: categoryRow } = await supabase.from('categories').select('id').eq('name', category).single();
+      if (!categoryRow) return showToast(`Category "${category}" not found in database. Save it first.`);
+      const slug = name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const { data, error } = await supabase.from('brands').insert({ name, slug, category_id: categoryRow.id }).select().single();
+      if (error) return showToast(`Brand save failed: ${error.message}`);
+      brand.id = data.id;
+    }
     brands.push(brand); saveAdminData(); renderAdmin();
   });
   document.querySelector('#product-form')?.addEventListener('submit', async event => {
@@ -1002,7 +1163,18 @@ function renderAdmin() {
     if (existing) managedProducts[Number(index)] = product; else managedProducts.push(product); products = managedProducts; saveAdminData(); renderAdmin(); showToast('Product saved.');
   });
   mountBrandControls();
-  if (authenticated && supabaseConfigured) { subscribeToOrders(); startOrdersPolling(); if (!ordersLoaded && (adminView === 'overview' || adminView === 'orders')) fetchOrders(); if (!managementLoaded && (adminView === 'products' || adminView === 'categories')) syncManagementData(); }
+  if (authenticated) {
+    // Always start polling (works with or without Supabase — loads localStorage orders too)
+    startOrdersPolling();
+    if (supabaseConfigured) {
+      subscribeToOrders();
+      if (adminView === 'overview' || adminView === 'orders') fetchOrders();
+      if (!managementLoaded && (adminView === 'products' || adminView === 'categories')) syncManagementData();
+    } else {
+      // No Supabase — load from localStorage immediately
+      fetchOrders();
+    }
+  }
 }
 
 if (window.location.pathname.startsWith('/admin')) renderAdmin(); else { render(); hydrateStorefront(); subscribeToCatalogue(); }
