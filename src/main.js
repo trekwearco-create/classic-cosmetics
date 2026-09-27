@@ -16,6 +16,8 @@ let cart = JSON.parse(localStorage.getItem('classic-cart') || '[]');
 let liveOrders = [];
 let ordersLoaded = false;
 let ordersChannel = null;
+let ordersPoller = null;
+let catalogueChannel = null;
 const money = value => `Rs. ${value.toLocaleString('en-PK')}`;
 const save = () => localStorage.setItem('classic-cart', JSON.stringify(cart));
 const cartCount = () => cart.reduce((total, item) => total + item.quantity, 0);
@@ -63,7 +65,7 @@ function bindEvents() {
     document.querySelector('#shop-title').textContent = category;
     document.querySelector('.products').innerHTML = (filtered.length ? filtered : products).map(productCard).join('');
     document.querySelectorAll('[data-add]').forEach(button => button.onclick = () => add(button.dataset.add));
-    document.querySelectorAll('[data-details]').forEach(button => button.onclick = () => add(button.dataset.details));
+    document.querySelectorAll('[data-details]').forEach(button => button.onclick = () => showProductDetails(button.dataset.details));
   });
   document.querySelector('#view-all').onclick = () => { document.querySelector('#shop-title').textContent = 'Most loved'; document.querySelector('.products').innerHTML = products.map(productCard).join(''); bindEvents(); };
   document.querySelector('#newsletter-form').onsubmit = event => { event.preventDefault(); event.target.reset(); showToast('Welcome to the Classic circle.'); };
@@ -91,6 +93,14 @@ async function hydrateStorefront() {
   if (categoryData?.length) categories = categoryData.map(category => category.name);
   if (productData?.length) products = productData.map(product => ({ ...product, type: product.categories?.name || 'Uncategorized', image: product.images?.[0] || '' }));
   render();
+}
+
+function subscribeToCatalogue() {
+  if (!supabaseConfigured || catalogueChannel) return;
+  catalogueChannel = supabase.channel('storefront-catalogue-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, hydrateStorefront)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, hydrateStorefront)
+    .subscribe();
 }
 
 function closeCheckout() { document.querySelector('.checkout-modal')?.classList.remove('open'); }
@@ -139,6 +149,13 @@ function subscribeToOrders() {
     }).subscribe();
 }
 
+function startOrdersPolling() {
+  if (!supabaseConfigured || ordersPoller) return;
+  ordersPoller = window.setInterval(() => {
+    if (!document.activeElement?.closest('form')) fetchOrders();
+  }, 10000);
+}
+
 async function updateOrderStatus(id, status) {
   if (!supabaseConfigured) return showToast('Add Supabase keys to update orders.');
   const { error } = await supabase.from('orders').update({ status, order_status: status.toLowerCase() }).eq('id', id);
@@ -156,21 +173,44 @@ const orders = [
 let adminView = 'overview';
 let managementLoaded = false;
 let categories = JSON.parse(localStorage.getItem('classic-categories') || 'null') || ['Skincare', 'Makeup', 'Fragrance', 'Bath & Body'];
+let brands = JSON.parse(localStorage.getItem('classic-brands') || 'null') || [];
 let managedProducts = JSON.parse(localStorage.getItem('classic-products') || 'null') || products.map(product => ({ ...product, description: '' }));
-const saveAdminData = () => { localStorage.setItem('classic-categories', JSON.stringify(categories)); localStorage.setItem('classic-products', JSON.stringify(managedProducts)); };
+const saveAdminData = () => { localStorage.setItem('classic-categories', JSON.stringify(categories)); localStorage.setItem('classic-brands', JSON.stringify(brands)); localStorage.setItem('classic-products', JSON.stringify(managedProducts)); };
 const slugify = value => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 async function syncManagementData() {
   if (!supabaseConfigured) return;
-  const [{ data: categoryData }, { data: productData }] = await Promise.all([supabase.from('categories').select('*').order('name'), supabase.from('products').select('*, categories(name)').order('created_at', { ascending: false })]);
+  const [{ data: categoryData }, { data: brandData }, { data: productData }] = await Promise.all([supabase.from('categories').select('*').order('name'), supabase.from('brands').select('*, categories(name)').order('name'), supabase.from('products').select('*, categories(name), brands(name)').order('created_at', { ascending: false })]);
   if (categoryData?.length) categories = categoryData.map(category => category.name);
-  if (productData?.length) managedProducts = productData.map(product => ({ ...product, type: product.categories?.name || 'Uncategorized', image: product.images?.[0] || '' }));
+  if (brandData) brands = brandData.map(brand => ({ id: brand.id, name: brand.name, category: brand.categories?.name || '' }));
+  if (productData?.length) managedProducts = productData.map(product => ({ ...product, type: product.categories?.name || 'Uncategorized', brand: product.brands?.name || '', image: product.images?.[0] || '' }));
   managementLoaded = true; saveAdminData();
   if (!document.activeElement?.closest('form')) renderAdmin();
 }
 
 function ordersView(displayedOrders) {
   return `<section class="admin-card orders-card"><div class="card-title"><div><p class="eyebrow">Live order feed</p><h2>Customer orders</h2></div><button class="add-product" id="refresh-orders">↻ Refresh</button></div><div class="orders-table"><div class="table-head order-head"><span>Order / date</span><span>Customer & phone</span><span>Address</span><span>Items</span><span>Payment</span><span>Total</span><span>Status</span></div>${displayedOrders.map(o=>{const real=o.id;const name=o.name||o.customer_name;const phone=o.phone||o.customer_phone||'—';const address=[o.address||o.customer_address,o.city].filter(Boolean).join(', ')||'—';const items=o.items?.map(i=>`<span class="order-item">${i.image?`<img src="${i.image}" alt=""/>`:''}${i.product_name||i.name} ×${i.quantity}</span>`).join('')||'Order items';const status=o.status||o.order_status||'Pending';return `<div class="order-row order-details"><span><strong>${o.order_number||o.no||String(real||'').slice(0,8)}</strong><small>${o.created_at?new Date(o.created_at).toLocaleDateString('en-PK'):o.time}</small></span><span>${name}<small>${phone}</small></span><span>${address}</span><span class="order-items">${items}</span><span>${o.payment_method||o.payment}</span><span>${money(Number(o.total_amount||o.amount))}</span><span>${real?`<select class="status-select" data-order-id="${real}">${['Pending','Processing','Confirmed','Shipped','Delivered','Cancelled'].map(s=>`<option ${s.toLowerCase()===(status||'').toLowerCase()?'selected':''}>${s}</option>`).join('')}</select>`:`<b class="status pending">${status}</b>`}</span></div>`}).join('')}</div></section>`;
+}
+
+function mountBrandControls() {
+  const productForm = document.querySelector('#product-form');
+  if (productForm && !productForm.elements.brand) {
+    const categoryLabel = productForm.elements.category.closest('label');
+    const label = document.createElement('label');
+    label.innerHTML = `Brand<select name="brand"><option value="">No brand</option>${brands.filter(brand => brand.category === productForm.elements.category.value).map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}</select>`;
+    categoryLabel.insertAdjacentElement('afterend', label);
+    productForm.elements.category.addEventListener('change', () => {
+      const selected = productForm.elements.category.value;
+      productForm.elements.brand.innerHTML = `<option value="">No brand</option>${brands.filter(brand => brand.category === selected).map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}`;
+    });
+  }
+  const categoriesPanel = document.querySelector('#category-form')?.closest('.admin-card');
+  if (categoriesPanel && !document.querySelector('#brand-form')) {
+    const panel = document.createElement('div');
+    panel.className = 'brand-manager';
+    panel.innerHTML = `<p class="eyebrow">Sub-categories</p><h2>Brands</h2><form id="brand-form" class="manager-form"><label>Category<select name="category">${categories.map(category => `<option>${category}</option>`).join('')}</select></label><input name="name" required placeholder="e.g. Garnier"/><button class="button">Add brand <span>→</span></button></form><div class="manager-list">${brands.length ? brands.map((brand, index) => `<div><span><strong>${brand.name}</strong><small>${brand.category}</small></span><span><button data-rename-brand="${index}">Rename</button><button data-delete-brand="${index}">Delete</button></span></div>`).join('') : '<p class="empty-state">No brands added yet.</p>'}</div>`;
+    categoriesPanel.append(panel);
+  }
 }
 
 function renderAdmin() {
@@ -190,7 +230,7 @@ function renderAdmin() {
     const form = new FormData(event.currentTarget);
     const email = form.get('email');
     const password = form.get('password');
-    if (email === 'admin@classiccosmetics.com' && password === 'Classic@2026') {
+    if (!supabaseConfigured && email === 'admin@classiccosmetics.com' && password === 'Classic@2026') {
       sessionStorage.setItem('classic-admin', 'true'); renderAdmin();
     } else if (supabaseConfigured) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -199,7 +239,7 @@ function renderAdmin() {
     } else document.querySelector('#login-error').textContent = 'Email or password is incorrect.';
   });
   const adminMain = document.querySelector('.admin-main');
-  document.querySelector('#logout')?.addEventListener('click', async () => { if (supabaseConfigured) await supabase.auth.signOut(); sessionStorage.removeItem('classic-admin'); renderAdmin(); });
+  document.querySelector('#logout')?.addEventListener('click', async () => { if (supabaseConfigured) await supabase.auth.signOut(); if (ordersPoller) { clearInterval(ordersPoller); ordersPoller = null; } if (ordersChannel) { supabase?.removeChannel(ordersChannel); ordersChannel = null; } sessionStorage.removeItem('classic-admin'); renderAdmin(); });
   document.querySelector('.admin-sidebar')?.addEventListener('click', event => { const button = event.target.closest('[data-view]'); if (button) { adminView = button.dataset.view; renderAdmin(); } });
   adminMain?.addEventListener('click', async event => {
     const button = event.target.closest('button'); if (!button) return;
@@ -207,13 +247,21 @@ function renderAdmin() {
     if (button.dataset.deleteCategory !== undefined) { const name = categories[Number(button.dataset.deleteCategory)]; categories = categories.filter(category => category !== name); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('categories').delete().eq('name', name); }
     if (button.dataset.renameCategory !== undefined) { const index = Number(button.dataset.renameCategory); const oldName = categories[index]; const name = window.prompt('New category name', oldName)?.trim(); if (!name || name === oldName) return; categories[index] = name; managedProducts = managedProducts.map(product => product.type === oldName ? { ...product, type: name } : product); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('categories').update({ name, slug: slugify(name) }).eq('name', oldName); }
     if (button.dataset.deleteProduct !== undefined) { const product = managedProducts[Number(button.dataset.deleteProduct)]; managedProducts.splice(Number(button.dataset.deleteProduct), 1); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('products').delete().eq('id', product.id); }
-    if (button.dataset.editProduct !== undefined) { const product = managedProducts[Number(button.dataset.editProduct)]; const form = document.querySelector('#product-form'); form.elements.imageFile.required = false; Object.entries({ index: button.dataset.editProduct, name: product.name, category: product.type, price: product.price, shade: product.shade || '', description: product.description || '' }).forEach(([key, value]) => { form.elements[key].value = value; }); document.querySelector('#product-form-title').textContent = `Edit ${product.name}`; form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (button.dataset.editProduct !== undefined) { const product = managedProducts[Number(button.dataset.editProduct)]; const form = document.querySelector('#product-form'); form.elements.imageFile.required = false; Object.entries({ index: button.dataset.editProduct, name: product.name, category: product.type, price: product.price, shade: product.shade || '', description: product.description || '' }).forEach(([key, value]) => { form.elements[key].value = value; }); if (form.elements.brand) { form.elements.brand.innerHTML = `<option value="">No brand</option>${brands.filter(brand => brand.category === product.type).map(brand => `<option value="${brand.name}">${brand.name}</option>`).join('')}`; form.elements.brand.value = product.brand || ''; } document.querySelector('#product-form-title').textContent = `Edit ${product.name}`; form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (button.dataset.deleteBrand !== undefined) { const brand = brands[Number(button.dataset.deleteBrand)]; brands.splice(Number(button.dataset.deleteBrand), 1); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('brands').delete().eq('id', brand.id); }
+    if (button.dataset.renameBrand !== undefined) { const index = Number(button.dataset.renameBrand); const oldBrand = brands[index]; const name = window.prompt('New brand name', oldBrand.name)?.trim(); if (!name || name === oldBrand.name) return; brands[index] = { ...oldBrand, name }; managedProducts = managedProducts.map(product => product.brand === oldBrand.name ? { ...product, brand: name } : product); saveAdminData(); renderAdmin(); if (supabaseConfigured) await supabase.from('brands').update({ name }).eq('id', oldBrand.id); }
   });
   adminMain?.addEventListener('change', event => { if (event.target.matches('.status-select')) updateOrderStatus(event.target.dataset.orderId, event.target.value); });
   document.querySelector('#category-form')?.addEventListener('submit', async event => {
     event.preventDefault(); const name = new FormData(event.currentTarget).get('name').trim(); if (!name || categories.includes(name)) return;
     categories.push(name); saveAdminData(); renderAdmin();
     if (supabaseConfigured) { const { error } = await supabase.from('categories').upsert({ name, slug: slugify(name) }); if (error) showToast(`Category saved locally: ${error.message}`); }
+  });
+  document.querySelector('#brand-form')?.addEventListener('submit', async event => {
+    event.preventDefault(); const form = new FormData(event.currentTarget); const category = form.get('category'); const name = form.get('name').trim(); if (!name || brands.some(brand => brand.category === category && brand.name === name)) return;
+    let brand = { id: crypto.randomUUID(), name, category };
+    if (supabaseConfigured) { const { data: categoryRow } = await supabase.from('categories').select('id').eq('name', category).single(); const { data, error } = await supabase.from('brands').insert({ name, category_id: categoryRow?.id }).select().single(); if (error) return showToast(`Brand save failed: ${error.message}`); brand.id = data.id; }
+    brands.push(brand); saveAdminData(); renderAdmin();
   });
   document.querySelector('#product-form')?.addEventListener('submit', async event => {
     event.preventDefault();
@@ -227,11 +275,12 @@ function renderAdmin() {
       if (uploadError) return showToast(`Image upload failed: ${uploadError.message}`);
       image = supabase.storage.from('product-images').getPublicUrl(path).data.publicUrl;
     }
-    const product = { id: existing?.id || crypto.randomUUID(), name: form.get('name'), type: form.get('category'), price: Number(form.get('price')), shade: form.get('shade'), description: form.get('description'), image };
-    if (supabaseConfigured) { const { data: category } = await supabase.from('categories').select('id').eq('name', product.type).maybeSingle(); const payload = { name: product.name, description: product.description, category_id: category?.id || null, price: product.price, stock: 1, status: 'in_stock', images: [product.image] }; const request = existing ? supabase.from('products').update(payload).eq('id', product.id).select().single() : supabase.from('products').insert(payload).select().single(); const { data, error } = await request; if (error) return showToast(`Product save failed: ${error.message}`); product.id = data.id; }
+    const product = { id: existing?.id || crypto.randomUUID(), name: form.get('name'), type: form.get('category'), brand: form.get('brand') || '', price: Number(form.get('price')), shade: form.get('shade'), description: form.get('description'), image };
+    if (supabaseConfigured) { const [{ data: category }, { data: brand }] = await Promise.all([supabase.from('categories').select('id').eq('name', product.type).maybeSingle(), product.brand ? supabase.from('brands').select('id').eq('name', product.brand).maybeSingle() : Promise.resolve({ data: null })]); const payload = { name: product.name, description: product.description, category_id: category?.id || null, brand_id: brand?.id || null, price: product.price, stock: 1, status: 'in_stock', images: [product.image] }; const request = existing ? supabase.from('products').update(payload).eq('id', product.id).select().single() : supabase.from('products').insert(payload).select().single(); const { data, error } = await request; if (error) return showToast(`Product save failed: ${error.message}`); product.id = data.id; }
     if (existing) managedProducts[Number(index)] = product; else managedProducts.push(product); products = managedProducts; saveAdminData(); renderAdmin(); showToast('Product saved.');
   });
-  if (authenticated && supabaseConfigured) { subscribeToOrders(); if (!ordersLoaded && (adminView === 'overview' || adminView === 'orders')) fetchOrders(); if (!managementLoaded && (adminView === 'products' || adminView === 'categories')) syncManagementData(); }
+  mountBrandControls();
+  if (authenticated && supabaseConfigured) { subscribeToOrders(); startOrdersPolling(); if (!ordersLoaded && (adminView === 'overview' || adminView === 'orders')) fetchOrders(); if (!managementLoaded && (adminView === 'products' || adminView === 'categories')) syncManagementData(); }
 }
 
-if (window.location.pathname.startsWith('/admin')) renderAdmin(); else { render(); hydrateStorefront(); }
+if (window.location.pathname.startsWith('/admin')) renderAdmin(); else { render(); hydrateStorefront(); subscribeToCatalogue(); }
