@@ -476,20 +476,20 @@ function renderStorefrontShell(mainContentHtml) {
                 'Bath & Body': { grad: 'linear-gradient(135deg,#55efc4,#00b894)', icon: 'M7 20h10M9 20V6a3 3 0 0 1 6 0v14M6 10h12' }
               };
               const cfg = catIcons[cat] || { grad: 'linear-gradient(135deg,#c6a664,#e4d4b8)', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' };
-              return \`
-                <a href="/category/\${slugify(cat)}" data-nav-category="\${cat}" class="mobile-menu-item">
-                  <span class="mobile-menu-icon" style="background: \${cfg.grad};">
+              return `
+                <a href="/category/${slugify(cat)}" data-nav-category="${cat}" class="mobile-menu-item">
+                  <span class="mobile-menu-icon" style="background: ${cfg.grad};">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2a2214" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="\${cfg.icon}"></path>
+                      <path d="${cfg.icon}"></path>
                     </svg>
                   </span>
                   <div class="mobile-menu-text">
-                    <strong>\${cat}</strong>
-                    <span>Shop \${cat.toLowerCase()} collection</span>
+                    <strong>${cat}</strong>
+                    <span>Shop ${cat.toLowerCase()} collection</span>
                   </div>
                   <span class="mobile-menu-arrow">›</span>
                 </a>
-              \`;
+              `;
             }).join('')}
           </nav>
         </div>
@@ -943,24 +943,24 @@ function renderHomePage() {
             const count = products.filter(p => (p.brand || '').toLowerCase() === b.name.toLowerCase()).length;
             const initial = (b.name || 'B').charAt(0).toUpperCase();
             const brandCat = b.category || '';
-            return \`
-              <a class="brand-tile-card" href="/category/\${slugify(brandCat)}/brand/\${slugify(b.name)}" data-nav-brand-category="\${brandCat}" data-nav-brand-name="\${b.name}">
-                <div class="brand-tile-avatar">\${initial}</div>
-                <strong class="brand-tile-name">\${b.name}</strong>
-                <span class="brand-tile-count">\${brandCat ? brandCat + ' · ' : ''}\${count} product\${count === 1 ? '' : 's'}</span>
+            return `
+              <a class="brand-tile-card" href="/category/${slugify(brandCat)}/brand/${slugify(b.name)}" data-nav-brand-category="${brandCat}" data-nav-brand-name="${b.name}">
+                <div class="brand-tile-avatar">${initial}</div>
+                <strong class="brand-tile-name">${b.name}</strong>
+                <span class="brand-tile-count">${brandCat ? brandCat + ' · ' : ''}${count} product${count === 1 ? '' : 's'}</span>
                 <span class="brand-tile-cta">Shop Brand →</span>
               </a>
-            \`;
+            `;
           }).join('')}
         </div>
-      ` : \`
+      ` : `
         <div class="empty-search-state" style="margin-top:20px;">
           <div class="empty-icon">🏷️</div>
           <h3>No brands added yet</h3>
           <p>Brands will appear here once added from the Admin Portal.</p>
           <a class="button reset-search-btn" href="/admin" style="color:#fff;text-decoration:none;">Add Brands in Admin <span>→</span></a>
         </div>
-      \`}
+      `}
     </section>
 
     <!-- Main Storefront Catalogue -->
