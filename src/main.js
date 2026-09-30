@@ -4,7 +4,7 @@ import './admin-management.css';
 import './storefront-pages.css';
 import { supabase, supabaseConfigured } from './supabase.js';
 import footerDocuments from './footer-content.json';
-import easyPaisaLogo from './assets/easypaisa-logo.png';
+import easyPaisaLogo from './assets/easypaisa-logo.jpg';
 import jazzCashLogo from './assets/jazzcash-logo.png';
 
 /* ==========================================================================

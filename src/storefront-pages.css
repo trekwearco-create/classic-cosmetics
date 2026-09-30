@@ -574,35 +574,38 @@
 .site-footer {
   background: #fff;
   border-top: 1px solid #eee7dd;
-  padding: 36px max(6%, calc((100vw - 1240px) / 2));
+  padding: 40px max(5.5%, calc((100vw - 1240px) / 2)) 32px;
   color: #221f1b;
   font-family: 'DM Sans', sans-serif;
+  display: block !important;
 }
 .footer-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
-  gap: 28px 56px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.85fr);
+  gap: 0 42px;
   max-width: 1240px;
   margin: 0 auto;
 }
 .footer-documents {
-  grid-column: 1 / -1;
+  display: grid;
+  grid-column: 2 / 4;
+  grid-row: 1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 26px;
+  align-content: start;
 }
 .footer-document {
-  border-bottom: 1px solid #eee7dd;
-}
-.footer-document:first-child {
-  border-top: 1px solid #eee7dd;
+  border: 0;
 }
 .footer-document summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 17px 4px;
-  color: #221f1b;
-  font-size: 15px;
-  font-weight: 700;
+  padding: 7px 0;
+  color: #777;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.45;
   list-style: none;
   cursor: pointer;
@@ -611,20 +614,11 @@
   display: none;
 }
 .footer-document summary::after {
-  content: "+";
-  flex: 0 0 24px;
-  color: var(--gold);
-  font-size: 21px;
-  font-weight: 400;
-  line-height: 1;
-  text-align: center;
-}
-.footer-document[open] summary::after {
-  content: "-";
+  content: none;
 }
 .footer-document-content {
-  max-width: 980px;
-  padding: 2px 4px 20px;
+  max-width: 460px;
+  padding: 8px 0 18px;
   color: #4a443c;
   font-size: 13.5px;
   line-height: 1.7;
@@ -647,11 +641,19 @@
 .footer-payment-section {
   min-width: 0;
 }
+.footer-contact-section {
+  grid-column: 1;
+  grid-row: 1;
+}
+.footer-payment-section {
+  grid-column: 4;
+  grid-row: 1;
+}
 .footer-contact-section h2,
 .footer-payment-section h2 {
   margin: 0 0 14px;
   color: #221f1b;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 }
 .footer-contact-section address {
@@ -679,17 +681,39 @@
 .footer-payment-logo {
   display: block;
   width: auto;
-  height: 38px;
+  height: 32px;
   object-fit: contain;
 }
 .footer-payment-logo-easypaisa {
-  max-width: 148px;
+  max-width: 120px;
 }
 .footer-payment-logo-jazzcash {
-  max-width: 48px;
+  max-width: 42px;
 }
 
-/* Footer: Mobile Responsive */
+@media (max-width: 980px) {
+  .site-footer {
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+  .footer-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px 36px;
+  }
+  .footer-documents {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .footer-contact-section {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .footer-payment-section {
+    grid-column: 2;
+    grid-row: auto;
+  }
+}
+
 @media (max-width: 640px) {
   .site-footer {
     padding: 28px 20px;
@@ -700,9 +724,11 @@
   }
   .footer-documents {
     grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
   .footer-document summary {
-    padding: 15px 2px;
+    padding: 12px 0;
     font-size: 14px;
   }
   .footer-document-content {
@@ -713,6 +739,11 @@
   .footer-payment-section {
     padding-top: 18px;
     border-top: 1px solid #eee7dd;
+  }
+  .footer-contact-section,
+  .footer-payment-section {
+    grid-column: auto;
+    grid-row: auto;
   }
   .footer-contact-section address {
     overflow-wrap: anywhere;
