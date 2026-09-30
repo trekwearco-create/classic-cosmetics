@@ -271,11 +271,7 @@ function showThankYouModal(order) {
 
       <div class="thankyou-actions">
         <button class="button thankyou-continue-btn" id="close-thankyou-btn">Continue Shopping <span>→</span></button>
-<<<<<<< HEAD
         <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello Glass Skin Store! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
-=======
-        <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello Classic Cosmetics! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
           Chat on WhatsApp <span>💬</span>
         </a>
       </div>
@@ -421,11 +417,7 @@ function renderStorefrontShell(mainContentHtml) {
     <header>
       <button class="menu-button" aria-label="Open navigation">☰</button>
       <a class="logo" href="/" data-nav-home="true">
-<<<<<<< HEAD
         <span>GLASS SKIN</span><em>store</em>
-=======
-        <span>CLASSIC</span><em>cosmetics</em>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
       </a>
       <nav class="desktop-only">
         <a href="/" data-nav-home="true">Home</a>
@@ -449,11 +441,7 @@ function renderStorefrontShell(mainContentHtml) {
     <aside class="mobile-menu" aria-hidden="true">
       <div class="mobile-menu-header">
         <div class="mobile-menu-logo">
-<<<<<<< HEAD
           <span>GLASS SKIN</span><em>store</em>
-=======
-          <span>CLASSIC</span><em>cosmetics</em>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         </div>
         <button class="close-menu" aria-label="Close menu">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -634,7 +622,6 @@ function renderStorefrontShell(mainContentHtml) {
     </main>
 
     <footer class="site-footer">
-<<<<<<< HEAD
       <div class="footer-main-grid">
         <!-- Column 1: Logo + Business Info -->
         <div class="footer-col footer-col-brand">
@@ -680,111 +667,15 @@ function renderStorefrontShell(mainContentHtml) {
             <span class="footer-pay-badge footer-pay-jazzcash">JazzCash</span>
           </div>
         </div>
-=======
-      <div class="footer-accordion-wrap">
-        <!-- 1. Contact Us Accordion -->
-        <div class="footer-accordion-item">
-          <button class="footer-accordion-btn" type="button" aria-expanded="false">
-            <span class="footer-accordion-title">Contact Us</span>
-            <span class="footer-accordion-icon">+</span>
-          </button>
-          <div class="footer-accordion-content">
-            <div class="footer-content-inner">
-              <a class="footer-contact-row" href="tel:+923222495034">
-                <span class="footer-contact-icon">📞</span>
-                <span>+92 322 2495034</span>
-              </a>
-              <a class="footer-contact-row" href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">
-                <span class="footer-contact-icon">💬</span>
-                <span>WhatsApp: +92 322 2495034</span>
-              </a>
-              <a class="footer-contact-row" href="mailto:support@classiccosmetics.pk">
-                <span class="footer-contact-icon">✉</span>
-                <span>support@classiccosmetics.pk</span>
-              </a>
-              <div class="footer-contact-row" style="color:#666;">
-                <span class="footer-contact-icon">📍</span>
-                <span>Plot R41, Hussainabad, F.B. Area, Block 2, Gulberg Town, Karachi, Pakistan</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. Our Company Accordion -->
-        <div class="footer-accordion-item">
-          <button class="footer-accordion-btn" type="button" aria-expanded="false">
-            <span class="footer-accordion-title">Our Company</span>
-            <span class="footer-accordion-icon">+</span>
-          </button>
-          <div class="footer-accordion-content">
-            <div class="footer-content-inner">
-              <p class="footer-desc-text">
-                Classic Cosmetics is a premium beauty destination in Pakistan that offers 100% original skincare, makeup, and luxurious fragrances. We believe in the highest quality products and customer trust.
-              </p>
-              <a class="footer-sub-link" href="/about" data-nav-page="/about">About Us</a>
-              <a class="footer-sub-link" href="/faqs" data-nav-page="/faqs">FAQ's</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Categories Accordion (Dynamic from Database) -->
-        <div class="footer-accordion-item">
-          <button class="footer-accordion-btn" type="button" aria-expanded="false">
-            <span class="footer-accordion-title">Categories</span>
-            <span class="footer-accordion-icon">+</span>
-          </button>
-          <div class="footer-accordion-content">
-            <div class="footer-content-inner">
-              ${categories.map(cat => `<a class="footer-sub-link" href="/category/${slugify(cat)}" data-nav-category="${cat}">${cat}</a>`).join('')}
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Policies Accordion -->
-        <div class="footer-accordion-item">
-          <button class="footer-accordion-btn" type="button" aria-expanded="false">
-            <span class="footer-accordion-title">Policies</span>
-            <span class="footer-accordion-icon">+</span>
-          </button>
-          <div class="footer-accordion-content">
-            <div class="footer-content-inner">
-              <a class="footer-sub-link" href="/privacy-policy" data-nav-page="/privacy-policy">Privacy & Cookies Policy</a>
-              <a class="footer-sub-link" href="/terms" data-nav-page="/terms">Terms & Conditions</a>
-              <a class="footer-sub-link" href="/delivery-and-returns" data-nav-page="/delivery-and-returns">Delivery & Return</a>
-              <a class="footer-sub-link" href="/track-order" data-nav-page="/track-order">Track Your Order</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer Brand Emblem & Trust Highlights -->
-      <div class="footer-brand-emblem-wrap">
-        <div class="footer-crown-badge">👑</div>
-        <p class="footer-tagline-text">Classic Cosmetics — Pakistan's #1 Destination for Authentic Luxury Beauty.</p>
-        <div class="footer-trust-strip">
-          <span class="footer-trust-item">✦ 100% Authentic Products</span>
-          <span class="footer-trust-item">✦ Fast 2-4 Days Delivery</span>
-          <span class="footer-trust-item">✦ 7 Days Easy Return & Exchange</span>
-          <span class="footer-trust-item">✦ Cash on Delivery Across Pakistan</span>
-        </div>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
       </div>
 
       <!-- Copyright Bar -->
       <div class="footer-copyright-bar">
-<<<<<<< HEAD
         Copyright © 2026 Glass Skin Store | All rights reserved.
       </div>
     </footer>
 
     <a class="whatsapp" href="https://wa.me/923222495034?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Glass Skin Store on WhatsApp">◔</a>
-=======
-        Copyright © 2026 Classic Cosmetics | All rights reserved.
-      </div>
-    </footer>
-
-    <a class="whatsapp" href="https://wa.me/923222495034?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Classic Cosmetics on WhatsApp">◔</a>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
 
     <aside class="cart-panel">
       <div class="cart-head"><h2>Your bag</h2><button class="close-cart" aria-label="Close cart">×</button></div>
@@ -1087,13 +978,8 @@ function renderHomePage() {
       <div class="editorial-copy">
         <p class="eyebrow">Our philosophy</p>
         <h2>Beauty should feel<br /><i>like a pause.</i></h2>
-<<<<<<< HEAD
         <p>We believe the small moments you give yourself matter most. Glass Skin Store brings together refined, effective beauty to turn the everyday into a personal ritual.</p>
         <a class="text-link" href="#contact">Meet Glass Skin Store →</a>
-=======
-        <p>We believe the small moments you give yourself matter most. Classic Cosmetics brings together refined, effective beauty to turn the everyday into a personal ritual.</p>
-        <a class="text-link" href="#contact">Meet Classic Cosmetics →</a>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
       </div>
     </section>
 
@@ -1115,11 +1001,7 @@ function renderHomePage() {
           <div class="contact-items">
             <a class="contact-item" href="tel:+923151247533"><div class="contact-icon">📞</div><div class="contact-text"><strong>Phone</strong><span>+92 315 1247533</span></div></a>
             <a class="contact-item" href="https://wa.me/923222495034" target="_blank"><div class="contact-icon">💬</div><div class="contact-text"><strong>WhatsApp</strong><span>+92 322 2495034</span></div></a>
-<<<<<<< HEAD
             <a class="contact-item" href="https://www.instagram.com/glassskinstore.pk" target="_blank"><div class="contact-icon">📸</div><div class="contact-text"><strong>Instagram</strong><span>@glassskinstore.pk</span></div></a>
-=======
-            <a class="contact-item" href="https://www.instagram.com/classic.cosmetic.pk" target="_blank"><div class="contact-icon">📸</div><div class="contact-text"><strong>Instagram</strong><span>@classic.cosmetic.pk</span></div></a>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
           </div>
         </div>
         <div class="contact-newsletter-col">
@@ -1409,21 +1291,13 @@ function renderAboutPage() {
 
     <div class="standalone-page-container">
       <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
-<<<<<<< HEAD
         <p class="eyebrow">The Glass Skin Philosophy</p>
-=======
-        <p class="eyebrow">The Classic Philosophy</p>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         <h1 style="font-family:'Playfair Display',serif; font-size:clamp(32px, 4vw, 48px); margin: 8px 0 16px;">Elegance, Made Everyday</h1>
       </div>
 
       <div class="page-lead-card">
         <p>
-<<<<<<< HEAD
           Glass Skin Store was founded with a singular conviction: luxury beauty should be timeless, uncompromising in quality, and completely authentic. We curate premier international and artisanal skincare, makeup, and perfumes for discerning beauty lovers across Pakistan.
-=======
-          Classic Cosmetics was founded with a singular conviction: luxury beauty should be timeless, uncompromising in quality, and completely authentic. We curate premier international and artisanal skincare, makeup, and perfumes for discerning beauty lovers across Pakistan.
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         </p>
       </div>
 
@@ -1451,11 +1325,7 @@ function renderAboutPage() {
       </div>
 
       <div style="margin-top: 48px; text-align: center; padding: 36px 20px; background: #fff; border: 1px solid #eee7dd; border-radius: 12px;">
-<<<<<<< HEAD
         <h3 style="font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 12px;">Experience Glass Skin Store Today</h3>
-=======
-        <h3 style="font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 12px;">Experience Classic Cosmetics Today</h3>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         <p style="color: #666; max-width: 500px; margin: 0 auto 24px; font-size: 14px;">Browse our handpicked collections of skincare essentials, velvet lip colors, and timeless fragrances.</p>
         <a class="button" href="/" data-nav-home="true">Shop The Collection <span>→</span></a>
       </div>
@@ -1535,11 +1405,7 @@ function renderFaqsPage() {
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-<<<<<<< HEAD
               Glass Skin Store offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+92 322 2495034). Our team will immediately arrange a replacement or refund at no extra shipping cost.
-=======
-              Classic Cosmetics offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+92 322 2495034). Our team will immediately arrange a replacement or refund at no extra shipping cost.
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
             </div>
           </div>
         </div>
@@ -1552,11 +1418,7 @@ function renderFaqsPage() {
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-<<<<<<< HEAD
               Absolutely 100%! Every product on Glass Skin Store is 100% authentic and original brand stock. We procure directly from authorized brand distributors and brand partners. Every product is delivered in its original packaging with verifiable batch codes.
-=======
-              Absolutely 100%! Every product on Classic Cosmetics is 100% authentic and original brand stock. We procure directly from authorized brand distributors and brand partners. Every product is delivered in its original packaging with verifiable batch codes.
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
             </div>
           </div>
         </div>
@@ -1569,11 +1431,7 @@ function renderFaqsPage() {
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-<<<<<<< HEAD
               Delivery on all Glass Skin Store orders is <strong>completely FREE</strong> nationwide! You do not need to pay any additional delivery charges.
-=======
-              Delivery on all Classic Cosmetics orders is <strong>completely FREE</strong> nationwide! You do not need to pay any additional delivery charges.
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
             </div>
           </div>
         </div>
@@ -1626,11 +1484,7 @@ function renderDeliveryReturnsPage() {
 
       <div class="page-lead-card">
         <p>
-<<<<<<< HEAD
           Our goal at Glass Skin Store is to deliver 100% authentic cosmetics to your door quickly and effortlessly. We place transparency and customer satisfaction as our top priority.
-=======
-          Our goal at Classic Cosmetics is to deliver 100% authentic cosmetics to your door quickly and effortlessly. We place transparency and customer satisfaction as our top priority.
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         </p>
       </div>
 
@@ -1761,13 +1615,8 @@ function renderPoliciesPage(type) {
 
       <div class="page-lead-card">
         <p>${isPrivacy 
-<<<<<<< HEAD
           ? "At Glass Skin Store, your personal information and online privacy are strictly safeguarded with state-of-the-art encryption and rigorous data security protocols." 
           : "Please read these terms and conditions carefully before placing orders on the Glass Skin Store official portal."}</p>
-=======
-          ? "At Classic Cosmetics, your personal information and online privacy are strictly safeguarded with state-of-the-art encryption and rigorous data security protocols." 
-          : "Please read these terms and conditions carefully before placing orders on the Classic Cosmetics official portal."}</p>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
       </div>
 
       <div style="background:#fff; border: 1px solid #ebdcc5; border-radius: 12px; padding: 28px 24px; font-size: 14px; line-height: 1.8; color: #444;">
@@ -1782,11 +1631,7 @@ function renderPoliciesPage(type) {
           <p>Your contact details will only be used for order dispatch notifications, shipping confirmations, and optional promotions. We never sell or distribute customer data to third parties.</p>
         ` : `
           <h3 style="font-family:'Playfair Display',serif; margin-top:0;">1. Genuine Products & Pricing</h3>
-<<<<<<< HEAD
           <p>All items displayed on Glass Skin Store are 100% genuine and priced in Pakistani Rupees (PKR). Prices are inclusive of applicable taxes.</p>
-=======
-          <p>All items displayed on Classic Cosmetics are 100% genuine and priced in Pakistani Rupees (PKR). Prices are inclusive of applicable taxes.</p>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
 
           <h3 style="font-family:'Playfair Display',serif;">2. Order Verification & Dispatch</h3>
           <p>Orders placed via Cash on Delivery are dispatched promptly following phone or automated SMS verification. Delivery timeline is 2 to 4 working days nationwide.</p>
@@ -1809,7 +1654,6 @@ function renderAdmin() {
   if (!authenticated) {
     document.querySelector('#app').innerHTML = `
       <main class="admin-login">
-<<<<<<< HEAD
         <a class="logo" href="/" data-nav-home="true"><span>GLASS SKIN</span><em>store</em></a>
         <section>
           <p class="eyebrow">Private access</p>
@@ -1817,24 +1661,11 @@ function renderAdmin() {
           <p>Sign in to manage your Glass Skin Store.</p>
           <form id="admin-login-form">
             <label>Email address<input name="email" required type="email" placeholder="admin@glassskinstore.com" /></label>
-=======
-        <a class="logo" href="/" data-nav-home="true"><span>CLASSIC</span><em>cosmetics</em></a>
-        <section>
-          <p class="eyebrow">Private access</p>
-          <h1>Welcome back.</h1>
-          <p>Sign in to manage your Classic Cosmetics store.</p>
-          <form id="admin-login-form">
-            <label>Email address<input name="email" required type="email" placeholder="admin@classiccosmetics.com" /></label>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
             <label>Password<input name="password" required type="password" placeholder="••••••••" /></label>
             <p id="login-error" class="login-error" role="alert" style="color:#d9534f;font-size:12px;margin:4px 0;"></p>
             <button class="button" type="submit">Sign in <span>→</span></button>
           </form>
-<<<<<<< HEAD
           <small style="display:block;margin-top:14px;color:#888;">Credentials: admin@glassskinstore.com / Classic@2026</small>
-=======
-          <small style="display:block;margin-top:14px;color:#888;">Credentials: admin@classiccosmetics.com / Classic@2026</small>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         </section>
       </main>
     `;
@@ -1853,11 +1684,7 @@ function renderAdmin() {
       }
       if (errorMessage) errorMessage.textContent = '';
       try {
-<<<<<<< HEAD
         if (email === 'admin@glassskinstore.com' && password === 'Classic@2026') {
-=======
-        if (email === 'admin@classiccosmetics.com' && password === 'Classic@2026') {
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
           sessionStorage.setItem('classic-admin', 'true');
           renderApp();
           return;
@@ -1890,11 +1717,7 @@ function renderAdmin() {
   document.querySelector('#app').innerHTML = `
     <div class="admin-shell">
       <aside class="admin-sidebar">
-<<<<<<< HEAD
         <a class="logo" href="/" data-nav-home="true"><span>GLASS SKIN</span><em>store</em></a>
-=======
-        <a class="logo" href="/" data-nav-home="true"><span>CLASSIC</span><em>cosmetics</em></a>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
         <p class="admin-label">Administration</p>
         <button class="admin-nav ${adminView === 'overview' ? 'active' : ''}" data-admin-view="overview">▦ Overview</button>
         <button class="admin-nav ${adminView === 'products' ? 'active' : ''}" data-admin-view="products">◈ Products <b>${products.length}</b></button>
@@ -1909,15 +1732,9 @@ function renderAdmin() {
 
       <main class="admin-main">
         <header class="admin-top">
-<<<<<<< HEAD
           <div><p class="eyebrow">Glass Skin Store</p><h1>Store Administration</h1></div>
           <div class="admin-actions">
             <span class="profile">GS <span>Administrator</span></span>
-=======
-          <div><p class="eyebrow">Classic Cosmetics</p><h1>Store Administration</h1></div>
-          <div class="admin-actions">
-            <span class="profile">CC <span>Administrator</span></span>
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
           </div>
         </header>
 
@@ -2899,22 +2716,6 @@ function bindGlobalEvents() {
     };
   }
 
-<<<<<<< HEAD
-=======
-  // Footer Accordion Triggers (Highfy-Style Expand/Collapse)
-  document.querySelectorAll('.footer-accordion-btn').forEach(btn => {
-    btn.onclick = (e) => {
-      e.preventDefault();
-      const item = btn.closest('.footer-accordion-item');
-      if (item) {
-        const wasOpen = item.classList.contains('open');
-        item.classList.toggle('open');
-        btn.setAttribute('aria-expanded', !wasOpen);
-      }
-    };
-  });
-
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
   // FAQ Accordion Triggers
   document.querySelectorAll('.faq-question-btn').forEach(btn => {
     btn.onclick = (e) => {

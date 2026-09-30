@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # Glass Skin Store
-=======
-# Classic Cosmetics
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
 
 Premium, responsive storefront implemented from the supplied PRD, UI/UX, technical, flow, and Supabase schema documents.
 

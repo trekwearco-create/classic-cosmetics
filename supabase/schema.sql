@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 -- Glass Skin Store: run in the Supabase SQL editor. Enable RLS before production data.
-=======
--- Classic Cosmetics: run in the Supabase SQL editor. Enable RLS before production data.
->>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
 create extension if not exists pgcrypto;
 create table categories (id uuid primary key default gen_random_uuid(), name text not null unique, slug text not null unique, created_at timestamptz not null default now());
 create table brands (id uuid primary key default gen_random_uuid(), category_id uuid not null references categories(id) on delete cascade, name text not null, slug text not null, logo_url text, created_at timestamptz not null default now(), unique(category_id, slug));
