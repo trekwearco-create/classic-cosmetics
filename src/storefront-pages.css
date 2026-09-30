@@ -2,6 +2,24 @@
    GLASS SKIN STORE: STANDALONE PAGES & DYNAMIC NAVIGATION STYLES
    ========================================================================== */
 
+header .logo {
+  align-items: center;
+  letter-spacing: 0;
+}
+header .logo img {
+  display: block;
+  width: auto;
+  height: 68px;
+  max-width: min(160px, calc(100vw - 160px));
+  object-fit: contain;
+}
+@media (max-width: 760px) {
+  header .logo img {
+    height: 50px;
+    max-width: calc(100vw - 100px);
+  }
+}
+
 /* Breadcrumb Navigation */
 .breadcrumbs-bar {
   background: #fbf9f6;

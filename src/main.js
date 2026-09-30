@@ -6,6 +6,7 @@ import { supabase, supabaseConfigured } from './supabase.js';
 import footerDocuments from './footer-content.json';
 import easyPaisaLogo from './assets/easypaisa-logo.jpg';
 import jazzCashLogo from './assets/jazzcash-logo.png';
+import storeLogo from './assets/glass-skin-store-logo.png.jpeg';
 
 /* ==========================================================================
    DEFAULT STATE & DATA MODELS
@@ -471,12 +472,12 @@ function renderStorefrontShell(mainContentHtml) {
     <header>
       <button class="menu-button" aria-label="Open navigation">☰</button>
       <a class="logo" href="/" data-nav-home="true">
-        <span>GLASS SKIN</span><em>store</em>
+        <img src="${storeLogo}" alt="Glass Skin Store" />
       </a>
       <nav class="desktop-only">
         <a href="/" data-nav-home="true">Home</a>
         ${categories.map(cat => `<a href="/category/${slugify(cat)}" data-nav-category="${cat}">${cat}</a>`).join('')}
-        <a href="#contact" data-nav-hash="contact">Contact</a>
+        <a href="/contact" data-nav-page="/contact">Contact</a>
       </nav>
       <div class="header-actions">
         <button class="desktop-only" aria-label="Search" onclick="document.querySelector('#mobile-search-input')?.focus()">⌕</button>
@@ -1005,7 +1006,7 @@ function renderHomePage() {
         <p class="eyebrow">Our philosophy</p>
         <h2>Beauty should feel<br /><i>like a pause.</i></h2>
         <p>We believe the small moments you give yourself matter most. Glass Skin Store brings together refined, effective beauty to turn the everyday into a personal ritual.</p>
-        <a class="text-link" href="#contact">Meet Glass Skin Store →</a>
+        <a class="text-link" href="/contact" data-nav-page="/contact">Meet Glass Skin Store →</a>
       </div>
     </section>
 
@@ -1017,30 +1018,6 @@ function renderHomePage() {
       <p>— AREEBA K., LAHORE</p>
     </section>
 
-    <!-- Contact Section -->
-    <section class="contact-section" id="contact">
-      <div class="contact-inner">
-        <div class="contact-info-col">
-          <p class="eyebrow">Get in touch</p>
-          <h2>Contact <i>Us</i></h2>
-          <p class="contact-sub">Our team is always available to help you. Reach out directly for any product or order queries.</p>
-          <div class="contact-items">
-            <a class="contact-item" href="tel:+923151247533"><div class="contact-icon">📞</div><div class="contact-text"><strong>Phone</strong><span>+92 315 1247533</span></div></a>
-            <a class="contact-item" href="https://wa.me/923222495034" target="_blank"><div class="contact-icon">💬</div><div class="contact-text"><strong>WhatsApp</strong><span>+92 322 2495034</span></div></a>
-            <a class="contact-item" href="https://www.instagram.com/glassskinstore.pk" target="_blank"><div class="contact-icon">📸</div><div class="contact-text"><strong>Instagram</strong><span>@glassskinstore.pk</span></div></a>
-          </div>
-        </div>
-        <div class="contact-newsletter-col">
-          <p class="eyebrow">A note from us</p>
-          <h3>Be first to know</h3>
-          <p>New arrivals, quiet offers and beauty notes — just the lovely bits.</p>
-          <form id="newsletter-form" class="newsletter-form-inline">
-            <input type="email" required placeholder="Your email address" aria-label="Email address" />
-            <button class="button" type="submit">Subscribe <span>→</span></button>
-          </form>
-        </div>
-      </div>
-    </section>
   `;
 
   return renderStorefrontShell(homeHtml);
