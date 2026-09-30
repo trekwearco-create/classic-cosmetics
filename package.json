@@ -1,0 +1,11 @@
+{
+<<<<<<< HEAD
+  "name": "glass-skin-store",
+=======
+  "name": "classic-cosmetics",
+>>>>>>> 600a3786915cf52aeebaf3e28daf71ce030048a2
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "dev": "vite", "build": "vite build", "preview": "vite preview" },
+  "dependencies": { "@supabase/supabase-js": "^2.49.1", "vite": "^6.2.2" }
+}
