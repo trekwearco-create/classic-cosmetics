@@ -3,6 +3,9 @@ import './checkout.css';
 import './admin-management.css';
 import './storefront-pages.css';
 import { supabase, supabaseConfigured } from './supabase.js';
+import footerDocuments from './footer-content.json';
+import easyPaisaLogo from './assets/easypaisa-logo.png';
+import jazzCashLogo from './assets/jazzcash-logo.png';
 
 /* ==========================================================================
    DEFAULT STATE & DATA MODELS
@@ -45,6 +48,43 @@ let isPollingActive = false;
    ========================================================================== */
 export const slugify = value => (value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const money = value => `Rs. ${Number(value || 0).toLocaleString('en-PK')}`;
+const escapeFooterText = value => String(value).replace(/[&<>"']/g, character => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+}[character]));
+const renderFooterDocumentParagraphs = paragraphs => {
+  let content = '';
+  let listIsOpen = false;
+
+  for (const paragraph of paragraphs) {
+    if (paragraph.list) {
+      if (!listIsOpen) {
+        content += '<ul>';
+        listIsOpen = true;
+      }
+      content += `<li>${escapeFooterText(paragraph.text)}</li>`;
+      continue;
+    }
+
+    if (listIsOpen) {
+      content += '</ul>';
+      listIsOpen = false;
+    }
+    content += `<p>${escapeFooterText(paragraph.text)}</p>`;
+  }
+
+  if (listIsOpen) content += '</ul>';
+  return content;
+};
+const renderFooterDocument = document => `
+  <details class="footer-document">
+    <summary>${escapeFooterText(document.title)}</summary>
+    <div class="footer-document-content">${renderFooterDocumentParagraphs(document.paragraphs)}</div>
+  </details>
+`;
 const paymentMethodLabel = method => ({
   cod: 'Cash on Delivery',
   easypaisa: 'EasyPaisa',
@@ -622,56 +662,28 @@ function renderStorefrontShell(mainContentHtml) {
     </main>
 
     <footer class="site-footer">
-      <div class="footer-main-grid">
-        <!-- Column 1: Logo + Business Info -->
-        <div class="footer-col footer-col-brand">
-          <a class="logo" href="/" data-nav-home="true"><span>GLASS SKIN</span><em>store</em></a>
-          <p class="footer-info-line"><strong>Business Name:</strong> Glass Skin Store</p>
-          <a class="footer-info-line" href="mailto:support@glassskinstore.com"><strong>Email:</strong> support@glassskinstore.com</a>
-          <a class="footer-info-line" href="tel:+923222495034"><strong>Phone:</strong> +92 322 2495034</a>
-          <p class="footer-info-line"><strong>Address:</strong> Plot R41, Hussainabad, F.B. Area, Block 2, Gulberg Town, Karachi, Pakistan</p>
-          <p class="footer-trustpilot-line">Verified by real customers. Trustpilot Reviews</p>
+      <div class="footer-inner">
+        <div class="footer-documents">
+          ${footerDocuments.map(renderFooterDocument).join('')}
         </div>
 
-        <!-- Column 2: OUR POLICIES -->
-        <div class="footer-col">
-          <h4 class="footer-col-title">OUR POLICIES</h4>
-          <a class="footer-sub-link" href="/delivery-and-returns" data-nav-page="/delivery-and-returns">Return &amp; Exchange Policy</a>
-          <a class="footer-sub-link" href="/terms" data-nav-page="/terms">Term &amp; Conditions</a>
-          <a class="footer-sub-link" href="/privacy-policy" data-nav-page="/privacy-policy">Privacy Policy</a>
-          <a class="footer-sub-link" href="/delivery-and-returns" data-nav-page="/delivery-and-returns">Shipping &amp; Delivery</a>
-          <a class="footer-sub-link" href="/delivery-and-returns" data-nav-page="/delivery-and-returns">Refund Policy</a>
-        </div>
+        <section class="footer-contact-section" aria-labelledby="footer-contact-title">
+          <h2 id="footer-contact-title">Contact Us</h2>
+          <address>
+            <p><strong>Phone:</strong> <a href="tel:+923172841178">+923172841178</a></p>
+            <p><strong>Phone:</strong> <a href="tel:+923222495034">+92 322 2495034</a></p>
+            <p><strong>Address:</strong> House # 26, Usmania Society, behind Lamcy Hall, Nazimabad No. 1, Karachi</p>
+            <p><strong>Email:</strong> <a href="mailto:info.glassskintore@gmail.com">info.glassskintore@gmail.com</a></p>
+          </address>
+        </section>
 
-        <!-- Column 3: HELP & SUPPORT -->
-        <div class="footer-col">
-          <h4 class="footer-col-title">HELP &amp; SUPPORT</h4>
-          <a class="footer-sub-link" href="/about" data-nav-page="/about">About Us</a>
-          <a class="footer-sub-link" href="#contact" data-nav-hash="contact">Contact Us</a>
-        </div>
-
-        <!-- Column 4: Social + Payment -->
-        <div class="footer-col footer-col-social">
-          <h4 class="footer-col-title footer-social-heading">Our Social Links:</h4>
-          <div class="footer-social-row">
-            <a class="footer-social-btn footer-social-fb" href="https://www.facebook.com/classic.cosmetic.pk" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94z"/></svg>
-            </a>
-            <a class="footer-social-btn footer-social-ig" href="https://www.instagram.com/glassskinstore.pk" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85 0 3.2-.01 3.58-.07 4.85-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.65.07-4.85.07-3.2 0-3.58-.01-4.85-.07-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85 0-3.2.01-3.58.07-4.85.15-3.23 1.66-4.77 4.92-4.92 1.27-.06 1.65-.07 4.85-.07zm0 3.68a6.16 6.16 0 100 12.32 6.16 6.16 0 000-12.32zm0 10.16a4 4 0 110-8 4 4 0 010 8zm6.41-11.85a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/></svg>
-            </a>
-          </div>
-          <h4 class="footer-col-title footer-payment-heading">Payment System:</h4>
+        <section class="footer-payment-section" aria-labelledby="footer-payment-title">
+          <h2 id="footer-payment-title">Payment System</h2>
           <div class="footer-payment-row">
-            <span class="footer-pay-badge footer-pay-easypaisa">easypaisa</span>
-            <span class="footer-pay-badge footer-pay-jazzcash">JazzCash</span>
+            <img class="footer-payment-logo footer-payment-logo-easypaisa" src="${easyPaisaLogo}" alt="EasyPaisa" />
+            <img class="footer-payment-logo footer-payment-logo-jazzcash" src="${jazzCashLogo}" alt="JazzCash" />
           </div>
-        </div>
-      </div>
-
-      <!-- Copyright Bar -->
-      <div class="footer-copyright-bar">
-        Copyright © 2026 Glass Skin Store | All rights reserved.
+        </section>
       </div>
     </footer>
 

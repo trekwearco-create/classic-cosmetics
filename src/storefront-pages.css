@@ -569,191 +569,156 @@
 }
 
 /* ==========================================================================
-   FOUR-COLUMN FOOTER (Reference-Style: Brand Info | Policies | Help | Social+Payment)
+   FOOTER DOCUMENTS, CONTACT, AND PAYMENT
    ========================================================================== */
 .site-footer {
-  background: #ffffff;
+  background: #fff;
   border-top: 1px solid #eee7dd;
-  padding: 46px max(6%, calc((100vw - 1240px) / 2)) 0;
+  padding: 36px max(6%, calc((100vw - 1240px) / 2));
   color: #221f1b;
   font-family: 'DM Sans', sans-serif;
-  display: block !important;
 }
-.footer-main-grid {
+.footer-inner {
   display: grid;
-  grid-template-columns: 1.5fr 1.1fr 1.1fr 1.3fr;
-  gap: 44px;
-  align-items: start;
-  padding-bottom: 38px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
+  gap: 28px 56px;
+  max-width: 1240px;
+  margin: 0 auto;
 }
-.footer-col {
+.footer-documents {
+  grid-column: 1 / -1;
+}
+.footer-document {
+  border-bottom: 1px solid #eee7dd;
+}
+.footer-document:first-child {
+  border-top: 1px solid #eee7dd;
+}
+.footer-document summary {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 11px;
-}
-.site-footer .footer-col-brand .logo {
-  margin-bottom: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 17px 4px;
   color: #221f1b;
-}
-.site-footer .footer-col-brand .logo span {
-  color: #221f1b;
-}
-.site-footer .footer-col-brand .logo em {
-  color: var(--gold);
-}
-.footer-info-line {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: #333;
-  margin: 0;
-  text-decoration: none;
-  max-width: 300px;
-}
-a.footer-info-line:hover {
-  color: var(--gold);
-}
-.footer-info-line strong {
+  font-size: 15px;
   font-weight: 700;
-  color: #221f1b;
+  line-height: 1.45;
+  list-style: none;
+  cursor: pointer;
 }
-.footer-trustpilot-line {
-  font-size: 13.5px;
-  color: #333;
-  line-height: 1.55;
-  margin: 10px 0 0;
-  max-width: 300px;
+.footer-document summary::-webkit-details-marker {
+  display: none;
 }
-.footer-col-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #221f1b;
-  letter-spacing: 0.05em;
-  margin: 4px 0 6px;
-  text-transform: uppercase;
-  font-family: 'DM Sans', sans-serif;
-}
-.site-footer a.footer-sub-link {
-  font-size: 13.5px;
+.footer-document summary::after {
+  content: "+";
+  flex: 0 0 24px;
+  color: var(--gold);
+  font-size: 21px;
   font-weight: 400;
-  color: #555;
-  text-decoration: none;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  transition: color 0.2s;
+  line-height: 1;
+  text-align: center;
 }
-.site-footer a.footer-sub-link:hover {
-  color: var(--gold);
+.footer-document[open] summary::after {
+  content: "-";
 }
-.footer-social-heading {
-  text-transform: none;
-  letter-spacing: 0.01em;
-  margin: 4px 0 8px;
+.footer-document-content {
+  max-width: 980px;
+  padding: 2px 4px 20px;
+  color: #4a443c;
+  font-size: 13.5px;
+  line-height: 1.7;
 }
-.footer-social-row {
-  display: flex;
-  align-items: center;
-  gap: 9px;
+.footer-document-content p {
+  margin: 0 0 12px;
 }
-.footer-social-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  text-decoration: none;
-  transition: transform 0.2s, opacity 0.2s;
+.footer-document-content p:last-child,
+.footer-document-content li:last-child {
+  margin-bottom: 0;
 }
-.footer-social-btn:hover {
-  transform: translateY(-3px);
-  opacity: 0.88;
+.footer-document-content ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
 }
-.footer-social-fb {
-  background: #1877f2;
+.footer-document-content li {
+  margin-bottom: 6px;
 }
-.footer-social-ig {
-  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+.footer-contact-section,
+.footer-payment-section {
+  min-width: 0;
 }
-.footer-payment-heading {
-  text-transform: none;
-  letter-spacing: 0.01em;
-  margin: 20px 0 8px;
+.footer-contact-section h2,
+.footer-payment-section h2 {
+  margin: 0 0 14px;
+  color: #221f1b;
+  font-size: 15px;
+  font-weight: 700;
+}
+.footer-contact-section address {
+  color: #4a443c;
+  font-size: 13.5px;
+  font-style: normal;
+  line-height: 1.65;
+}
+.footer-contact-section address p {
+  margin: 0 0 8px;
+}
+.footer-contact-section address p:last-child {
+  margin-bottom: 0;
+}
+.footer-contact-section a {
+  color: inherit;
+  text-decoration-color: #c4ad89;
+  text-underline-offset: 3px;
 }
 .footer-payment-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 18px;
 }
-.footer-pay-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 30px;
-  padding: 0 12px;
-  background: #fff;
-  border: 1px solid #e4e0d8;
-  border-radius: 5px;
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  font-style: italic;
+.footer-payment-logo {
+  display: block;
+  width: auto;
+  height: 38px;
+  object-fit: contain;
 }
-.footer-pay-easypaisa {
-  color: #43b02a;
+.footer-payment-logo-easypaisa {
+  max-width: 148px;
 }
-.footer-pay-jazzcash {
-  color: #d0021b;
-}
-.footer-copyright-bar {
-  background: #221f1b;
-  color: #ded5c8;
-  text-align: center;
-  padding: 14px 16px;
-  font-size: 11.5px;
-  letter-spacing: 0.05em;
-  margin: 0 calc(-1 * max(6%, calc((100vw - 1240px) / 2)));
+.footer-payment-logo-jazzcash {
+  max-width: 48px;
 }
 
-/* Footer: Mobile / Tablet Responsive */
-@media (max-width: 980px) {
-  .footer-main-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 34px;
-  }
-}
+/* Footer: Mobile Responsive */
 @media (max-width: 640px) {
   .site-footer {
-    padding-top: 38px;
+    padding: 28px 20px;
   }
-  .footer-main-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    justify-items: center;
-    text-align: center;
+  .footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
   }
-  .footer-col {
-    align-items: center;
+  .footer-documents {
+    grid-column: auto;
   }
-  .footer-col .logo {
-    align-items: center;
+  .footer-document summary {
+    padding: 15px 2px;
+    font-size: 14px;
   }
-  .footer-info-line,
-  .footer-trustpilot-line {
-    max-width: 340px;
+  .footer-document-content {
+    padding: 0 2px 18px;
+    font-size: 13px;
   }
-  .footer-col-title {
-    margin-bottom: 2px;
+  .footer-contact-section,
+  .footer-payment-section {
+    padding-top: 18px;
+    border-top: 1px solid #eee7dd;
   }
-  .footer-social-row,
+  .footer-contact-section address {
+    overflow-wrap: anywhere;
+  }
   .footer-payment-row {
-    justify-content: center;
-  }
-  .footer-payment-heading {
-    margin-top: 12px;
+    gap: 16px;
   }
 }
 
