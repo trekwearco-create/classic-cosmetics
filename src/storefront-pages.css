@@ -571,14 +571,31 @@
 /* ==========================================================================
    FOOTER DOCUMENTS, CONTACT, AND PAYMENT
    ========================================================================== */
+html,
+body,
+#root,
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+body,
+#root,
+#app {
+  flex: 1 0 auto;
+}
+#main-content {
+  flex: 1 0 auto;
+}
 .site-footer {
   background: #fff;
   border-top: 1px solid #eee7dd;
-  margin-top: 48px;
+  margin-top: auto;
   padding: 40px max(5.5%, calc((100vw - 1240px) / 2)) 32px;
   color: #221f1b;
   font-family: 'DM Sans', sans-serif;
   display: block !important;
+  flex-shrink: 0;
 }
 .footer-inner {
   display: grid;
@@ -713,7 +730,6 @@
 
 @media (max-width: 640px) {
   .site-footer {
-    margin-top: 32px;
     padding: 28px 20px;
   }
   .footer-inner {
