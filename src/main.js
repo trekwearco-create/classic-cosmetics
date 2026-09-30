@@ -6,7 +6,7 @@ import { supabase, supabaseConfigured } from './supabase.js';
 import footerDocuments from './footer-content.json';
 import easyPaisaLogo from './assets/easypaisa-logo.jpg';
 import jazzCashLogo from './assets/jazzcash-logo.png';
-import storeLogo from './assets/glass-skin-store-logo.png.jpeg';
+import storeLogo from './assets/glass-skin-store-logo-transparent.png';
 
 /* ==========================================================================
    DEFAULT STATE & DATA MODELS
