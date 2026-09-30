@@ -574,6 +574,7 @@
 .site-footer {
   background: #fff;
   border-top: 1px solid #eee7dd;
+  margin-top: 48px;
   padding: 40px max(5.5%, calc((100vw - 1240px) / 2)) 32px;
   color: #221f1b;
   font-family: 'DM Sans', sans-serif;
@@ -595,26 +596,18 @@
   align-content: start;
 }
 .footer-document {
-  border: 0;
-}
-.footer-document summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  display: block;
   padding: 7px 0;
   color: #777;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.45;
-  list-style: none;
-  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
 }
-.footer-document summary::-webkit-details-marker {
-  display: none;
-}
-.footer-document summary::after {
-  content: none;
+.footer-document:hover,
+.footer-contact-section h2 a:hover {
+  color: var(--gold);
 }
 .footer-document-content {
   max-width: 460px;
@@ -673,6 +666,10 @@
   text-decoration-color: #c4ad89;
   text-underline-offset: 3px;
 }
+.footer-contact-section h2 a {
+  color: #221f1b;
+  text-decoration: none;
+}
 .footer-payment-row {
   display: flex;
   align-items: center;
@@ -716,6 +713,7 @@
 
 @media (max-width: 640px) {
   .site-footer {
+    margin-top: 32px;
     padding: 28px 20px;
   }
   .footer-inner {
@@ -727,7 +725,7 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
-  .footer-document summary {
+  .footer-document {
     padding: 12px 0;
     font-size: 14px;
   }
@@ -750,6 +748,144 @@
   }
   .footer-payment-row {
     gap: 16px;
+  }
+}
+
+/* Dedicated information and policy pages */
+.information-page-container {
+  width: 100%;
+  max-width: 848px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+  overflow-wrap: anywhere;
+}
+.information-page-header {
+  max-width: 720px;
+  margin-bottom: 36px;
+}
+.information-page-header h1 {
+  margin: 8px 0 16px;
+  color: var(--ink);
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.information-page-intro {
+  margin: 0;
+  color: #5b554d;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.information-page-body {
+  color: #4a443c;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.information-page-body h2 {
+  margin: 38px 0 12px;
+  color: var(--ink);
+  font-family: 'Playfair Display', serif;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.information-page-body h3 {
+  margin: 24px 0 8px;
+  color: var(--ink);
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.information-page-body p {
+  margin: 0 0 16px;
+}
+.information-page-body ul {
+  margin: 0 0 18px;
+  padding-left: 24px;
+}
+.information-page-body li {
+  padding-left: 3px;
+  margin-bottom: 6px;
+}
+.back-home-link {
+  display: inline-flex;
+  margin-top: 36px;
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.back-home-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.contact-detail-list {
+  margin: 0;
+  border-top: 1px solid #eee7dd;
+}
+.contact-detail-row {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 20px;
+  padding: 17px 0;
+  border-bottom: 1px solid #eee7dd;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.contact-detail-row dt {
+  color: #777;
+  font-size: 13px;
+  font-weight: 600;
+}
+.contact-detail-row dd {
+  min-width: 0;
+  margin: 0;
+  color: #302b25;
+  overflow-wrap: anywhere;
+}
+.contact-detail-row a {
+  color: inherit;
+  text-decoration-color: #c4ad89;
+  text-underline-offset: 3px;
+}
+.contact-whatsapp-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+.contact-whatsapp-button svg {
+  width: 21px;
+  height: 21px;
+  fill: currentColor;
+}
+
+@media (max-width: 640px) {
+  .information-page-container {
+    padding: 38px 20px 60px;
+  }
+  .information-page-header {
+    margin-bottom: 28px;
+  }
+  .information-page-header h1 {
+    font-size: 32px;
+  }
+  .information-page-intro {
+    font-size: 15px;
+  }
+  .information-page-body {
+    font-size: 14px;
+  }
+  .information-page-body h2 {
+    margin-top: 30px;
+    font-size: 23px;
+  }
+  .contact-detail-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding: 14px 0;
   }
 }
 

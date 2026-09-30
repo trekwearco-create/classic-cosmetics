@@ -55,6 +55,15 @@ const escapeFooterText = value => String(value).replace(/[&<>"']/g, character =>
   '"': '&quot;',
   "'": '&#39;'
 }[character]));
+const footerPageRoutes = {
+  'Shipping & Delivery Policy': '/shipping-policy',
+  'About Us': '/about',
+  'Returns & Exchange': '/return-exchange',
+  'Refund Policy': '/refund-policy',
+  'Privacy Policy': '/privacy-policy',
+  'Terms & Conditions': '/terms'
+};
+const footerPageTitles = Object.fromEntries(Object.entries(footerPageRoutes).map(([title, route]) => [route, title]));
 const renderFooterDocumentParagraphs = paragraphs => {
   let content = '';
   let listIsOpen = false;
@@ -73,18 +82,23 @@ const renderFooterDocumentParagraphs = paragraphs => {
       content += '</ul>';
       listIsOpen = false;
     }
-    content += `<p>${escapeFooterText(paragraph.text)}</p>`;
+    const text = escapeFooterText(paragraph.text);
+    if (/^\d+\.\s/.test(paragraph.text)) {
+      content += `<h2>${text}</h2>`;
+    } else if (paragraph.text.length <= 58 && /^[A-Z]/.test(paragraph.text) && !/[.!?:;]$/.test(paragraph.text)) {
+      content += `<h3>${text}</h3>`;
+    } else {
+      content += `<p>${text}</p>`;
+    }
   }
 
   if (listIsOpen) content += '</ul>';
   return content;
 };
-const renderFooterDocument = document => `
-  <details class="footer-document">
-    <summary>${escapeFooterText(document.title)}</summary>
-    <div class="footer-document-content">${renderFooterDocumentParagraphs(document.paragraphs)}</div>
-  </details>
-`;
+const renderFooterDocument = document => {
+  const route = footerPageRoutes[document.title];
+  return `<a class="footer-document" href="${route}" data-nav-page="${route}">${escapeFooterText(document.title)}</a>`;
+};
 const paymentMethodLabel = method => ({
   cod: 'Cash on Delivery',
   easypaisa: 'EasyPaisa',
@@ -169,12 +183,12 @@ function getRoute() {
   }
 
   // Standalone Static & Informational Pages
-  if (path === '/about' || search.get('page') === 'about') return { view: 'about' };
+  const documentTitle = footerPageTitles[path] || footerPageTitles[`/${search.get('page')}`];
+  if (documentTitle) return { view: 'document-page', documentTitle };
+  if (path === '/contact' || search.get('page') === 'contact') return { view: 'contact' };
   if (path === '/faqs' || path === '/faq' || search.get('page') === 'faqs' || search.get('page') === 'faq') return { view: 'faqs' };
   if (path === '/delivery-and-returns' || path === '/delivery' || path === '/returns' || search.get('page') === 'delivery-and-returns') return { view: 'delivery-and-returns' };
   if (path === '/track-order' || search.get('page') === 'track-order') return { view: 'track-order' };
-  if (path === '/privacy-policy' || search.get('page') === 'privacy-policy') return { view: 'privacy-policy' };
-  if (path === '/terms' || search.get('page') === 'terms') return { view: 'terms' };
 
   return { view: 'home' };
 }
@@ -668,10 +682,10 @@ function renderStorefrontShell(mainContentHtml) {
         </div>
 
         <section class="footer-contact-section" aria-labelledby="footer-contact-title">
-          <h2 id="footer-contact-title">Contact Us</h2>
+          <h2 id="footer-contact-title"><a href="/contact" data-nav-page="/contact">Contact Us</a></h2>
           <address>
-            <p><strong>Phone:</strong> <a href="tel:+923172841178">+923172841178</a></p>
-            <p><strong>Phone:</strong> <a href="tel:+923222495034">+92 322 2495034</a></p>
+            <p><strong>Phone:</strong> <a href="https://wa.me/923172841178" target="_blank" rel="noopener noreferrer">+923172841178</a></p>
+            <p><strong>Phone:</strong> <a href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">+92 322 2495034</a></p>
             <p><strong>Address:</strong> House # 26, Usmania Society, behind Lamcy Hall, Nazimabad No. 1, Karachi</p>
             <p><strong>Email:</strong> <a href="mailto:info.glassskintore@gmail.com">info.glassskintore@gmail.com</a></p>
           </address>
@@ -1291,59 +1305,96 @@ function renderProductPage(productId) {
 /* ==========================================================================
    PAGE: ABOUT US (Standalone Brand Story)
    ========================================================================== */
-function renderAboutPage() {
-  const aboutHtml = `
+function renderDocumentPage(pageDocument) {
+  const isAboutPage = pageDocument.title === 'About Us';
+  const introParagraphCount = isAboutPage ? 2 : 1;
+  const intro = pageDocument.paragraphs[isAboutPage ? 1 : 0]?.text || '';
+  const eyebrow = isAboutPage ? pageDocument.paragraphs[0]?.text : 'Glass Skin Store';
+  const bodyParagraphs = pageDocument.paragraphs.slice(introParagraphCount);
+
+  const pageHtml = `
     <div class="breadcrumbs-bar">
       <div class="breadcrumbs-inner">
         <a href="/" data-nav-home="true">Home</a>
         <span class="breadcrumbs-sep">/</span>
-        <span class="breadcrumbs-current">About Us</span>
+        <span class="breadcrumbs-current">${escapeFooterText(pageDocument.title)}</span>
       </div>
     </div>
 
-    <div class="standalone-page-container">
-      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
-        <p class="eyebrow">The Glass Skin Philosophy</p>
-        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(32px, 4vw, 48px); margin: 8px 0 16px;">Elegance, Made Everyday</h1>
+    <article class="information-page-container">
+      <header class="information-page-header">
+        <p class="eyebrow">${escapeFooterText(eyebrow)}</p>
+        <h1>${escapeFooterText(pageDocument.title)}</h1>
+        <p class="information-page-intro">${escapeFooterText(intro)}</p>
+      </header>
+      <div class="information-page-body">
+        ${renderFooterDocumentParagraphs(bodyParagraphs)}
       </div>
-
-      <div class="page-lead-card">
-        <p>
-          Glass Skin Store was founded with a singular conviction: luxury beauty should be timeless, uncompromising in quality, and completely authentic. We curate premier international and artisanal skincare, makeup, and perfumes for discerning beauty lovers across Pakistan.
-        </p>
-      </div>
-
-      <div class="about-pillars-grid">
-        <div class="about-pillar-card">
-          <div class="about-pillar-icon">✨</div>
-          <h3>100% Genuine & Authentic</h3>
-          <p>Our foremost principle is authenticity. We source exclusively from direct brand partners and verified distributors. Zero replicas — guaranteed original products.</p>
-        </div>
-        <div class="about-pillar-card">
-          <div class="about-pillar-icon">🌿</div>
-          <h3>Curated For Every Ritual</h3>
-          <p>Every formula is thoughtfully chosen for the Pakistani climate and diverse skin tones, so you get both radiance and genuine care.</p>
-        </div>
-        <div class="about-pillar-card">
-          <div class="about-pillar-icon">🛡️</div>
-          <h3>Customer Trust & Transparency</h3>
-          <p>Cash on Delivery, parcel inspection at delivery, and a 7-day hassle-free return & exchange policy — complete peace of mind.</p>
-        </div>
-        <div class="about-pillar-card">
-          <div class="about-pillar-icon">🚚</div>
-          <h3>Rapid Nationwide Delivery</h3>
-          <p>From Lahore, Karachi, and Islamabad to every city across Pakistan — fast free delivery in 2–4 working days, right to your doorstep.</p>
-        </div>
-      </div>
-
-      <div style="margin-top: 48px; text-align: center; padding: 36px 20px; background: #fff; border: 1px solid #eee7dd; border-radius: 12px;">
-        <h3 style="font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 12px;">Experience Glass Skin Store Today</h3>
-        <p style="color: #666; max-width: 500px; margin: 0 auto 24px; font-size: 14px;">Browse our handpicked collections of skincare essentials, velvet lip colors, and timeless fragrances.</p>
-        <a class="button" href="/" data-nav-home="true">Shop The Collection <span>→</span></a>
-      </div>
-    </div>
+      <a class="back-home-link" href="/" data-nav-home="true">← Back to Home</a>
+    </article>
   `;
-  return renderStorefrontShell(aboutHtml);
+  return renderStorefrontShell(pageHtml);
+}
+
+function renderContactPage() {
+  const primaryWhatsApp = 'https://wa.me/923172841178';
+  const secondaryWhatsApp = 'https://wa.me/923222495034';
+  const contactHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">Contact Us</span>
+      </div>
+    </div>
+
+    <article class="information-page-container contact-page-container">
+      <header class="information-page-header">
+        <p class="eyebrow">Glass Skin Store</p>
+        <h1>Contact Us</h1>
+        <p class="information-page-intro">Our customer care team is available daily from 10 AM to 10 PM.</p>
+      </header>
+
+      <dl class="contact-detail-list">
+        <div class="contact-detail-row">
+          <dt>Business Name</dt>
+          <dd>Glass Skin Store</dd>
+        </div>
+        <div class="contact-detail-row">
+          <dt>Phone/WhatsApp Number</dt>
+          <dd>
+            <a href="${primaryWhatsApp}" target="_blank" rel="noopener noreferrer">+923172841178</a>
+            <span aria-hidden="true"> · </span>
+            <a href="${secondaryWhatsApp}" target="_blank" rel="noopener noreferrer">+92 322 2495034</a>
+          </dd>
+        </div>
+        <div class="contact-detail-row">
+          <dt>Email</dt>
+          <dd><a href="mailto:info.glassskintore@gmail.com">info.glassskintore@gmail.com</a></dd>
+        </div>
+        <div class="contact-detail-row">
+          <dt>Address</dt>
+          <dd>House # 26, Usmania Society, behind Lamcy Hall, Nazimabad No. 1, Karachi</dd>
+        </div>
+        <div class="contact-detail-row">
+          <dt>Working Hours</dt>
+          <dd>Daily, 10 AM to 10 PM</dd>
+        </div>
+      </dl>
+
+      <a class="button contact-whatsapp-button" href="${primaryWhatsApp}" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+        Chat on WhatsApp
+      </a>
+
+      <a class="back-home-link" href="/" data-nav-home="true">← Back to Home</a>
+    </article>
+  `;
+  return renderStorefrontShell(contactHtml);
+}
+
+function renderAboutPage() {
+  return renderDocumentPage(footerDocuments.find(document => document.title === 'About Us'));
 }
 
 /* ==========================================================================
@@ -1608,53 +1659,8 @@ function renderTrackOrderPage() {
    PAGE: POLICIES (Privacy & Cookies / Terms)
    ========================================================================== */
 function renderPoliciesPage(type) {
-  const isPrivacy = type === 'privacy-policy';
-  const title = isPrivacy ? 'Privacy & Cookies Policy' : 'Terms & Conditions';
-  const policyHtml = `
-    <div class="breadcrumbs-bar">
-      <div class="breadcrumbs-inner">
-        <a href="/" data-nav-home="true">Home</a>
-        <span class="breadcrumbs-sep">/</span>
-        <span class="breadcrumbs-current">${title}</span>
-      </div>
-    </div>
-
-    <div class="standalone-page-container">
-      <div class="section-heading" style="text-align:center; margin-bottom: 24px;">
-        <p class="eyebrow">Legal & Trust Guidelines</p>
-        <h1 style="font-family:'Playfair Display',serif; font-size:clamp(30px, 4vw, 44px); margin: 8px 0 16px;">${title}</h1>
-      </div>
-
-      <div class="page-lead-card">
-        <p>${isPrivacy 
-          ? "At Glass Skin Store, your personal information and online privacy are strictly safeguarded with state-of-the-art encryption and rigorous data security protocols." 
-          : "Please read these terms and conditions carefully before placing orders on the Glass Skin Store official portal."}</p>
-      </div>
-
-      <div style="background:#fff; border: 1px solid #ebdcc5; border-radius: 12px; padding: 28px 24px; font-size: 14px; line-height: 1.8; color: #444;">
-        ${isPrivacy ? `
-          <h3 style="font-family:'Playfair Display',serif; margin-top:0;">1. Information We Collect</h3>
-          <p>We only collect information essential for fulfilling your orders: your full name, shipping destination, mobile/WhatsApp number, and order preferences. We never store debit/credit card credentials.</p>
-
-          <h3 style="font-family:'Playfair Display',serif;">2. Cookies & Site Analytics</h3>
-          <p>We utilize standard cookies to remember your shopping bag items, understand navigation patterns, and enhance your overall browsing journey. You can adjust cookie preferences at any time via your browser settings.</p>
-
-          <h3 style="font-family:'Playfair Display',serif;">3. Zero Spam Commitment</h3>
-          <p>Your contact details will only be used for order dispatch notifications, shipping confirmations, and optional promotions. We never sell or distribute customer data to third parties.</p>
-        ` : `
-          <h3 style="font-family:'Playfair Display',serif; margin-top:0;">1. Genuine Products & Pricing</h3>
-          <p>All items displayed on Glass Skin Store are 100% genuine and priced in Pakistani Rupees (PKR). Prices are inclusive of applicable taxes.</p>
-
-          <h3 style="font-family:'Playfair Display',serif;">2. Order Verification & Dispatch</h3>
-          <p>Orders placed via Cash on Delivery are dispatched promptly following phone or automated SMS verification. Delivery timeline is 2 to 4 working days nationwide.</p>
-
-          <h3 style="font-family:'Playfair Display',serif;">3. Return & Exchange Policy</h3>
-          <p>Damaged or incorrect shipments must be reported within 7 days of delivery along with the original delivery slip and packaging for prompt replacement or refund.</p>
-        `}
-      </div>
-    </div>
-  `;
-  return renderStorefrontShell(policyHtml);
+  const title = type === 'privacy-policy' ? 'Privacy Policy' : 'Terms & Conditions';
+  return renderDocumentPage(footerDocuments.find(document => document.title === title));
 }
 
 /* ==========================================================================
@@ -2862,14 +2868,23 @@ export function renderApp() {
     return;
   }
 
+  document.title = route.view === 'document-page'
+    ? `${route.documentTitle} | Glass Skin Store`
+    : route.view === 'contact'
+      ? 'Contact Us | Glass Skin Store'
+      : 'Glass Skin Store — Elegance in Every Detail';
+
   if (route.view === 'product') {
     document.querySelector('#app').innerHTML = renderProductPage(route.productId);
   } else if (route.view === 'brand') {
     document.querySelector('#app').innerHTML = renderBrandPage(route.category, route.brand);
   } else if (route.view === 'category') {
     document.querySelector('#app').innerHTML = renderCategoryPage(route.category);
-  } else if (route.view === 'about') {
-    document.querySelector('#app').innerHTML = renderAboutPage();
+  } else if (route.view === 'document-page') {
+    const pageDocument = footerDocuments.find(document => document.title === route.documentTitle);
+    document.querySelector('#app').innerHTML = renderDocumentPage(pageDocument);
+  } else if (route.view === 'contact') {
+    document.querySelector('#app').innerHTML = renderContactPage();
   } else if (route.view === 'faqs') {
     document.querySelector('#app').innerHTML = renderFaqsPage();
   } else if (route.view === 'delivery-and-returns') {
