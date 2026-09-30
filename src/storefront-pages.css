@@ -776,6 +776,17 @@ body,
   overflow-wrap: anywhere;
 }
 .information-page-header {
+  position: static;
+  display: block;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  top: auto;
+  z-index: auto;
+  grid-template-columns: none;
   max-width: 720px;
   margin-bottom: 36px;
 }
