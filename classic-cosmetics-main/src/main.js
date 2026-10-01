@@ -271,7 +271,7 @@ function showThankYouModal(order) {
 
       <div class="thankyou-actions">
         <button class="button thankyou-continue-btn" id="close-thankyou-btn">Continue Shopping <span>→</span></button>
-        <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello Glass Skin Store! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
+        <a class="button whatsapp-btn" href="https://wa.me/923172841178?text=${encodeURIComponent(`Hello Glass Skin Store! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
           Chat on WhatsApp <span>💬</span>
         </a>
       </div>
@@ -603,7 +603,7 @@ function renderStorefrontShell(mainContentHtml) {
       </div>
 
       <div class="mobile-menu-footer">
-        <a class="mobile-menu-whatsapp" href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">
+        <a class="mobile-menu-whatsapp" href="https://wa.me/923172841178" target="_blank" rel="noopener noreferrer">
           <span class="wa-badge-icon">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" stroke="#fff" stroke-width="1">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
@@ -611,7 +611,7 @@ function renderStorefrontShell(mainContentHtml) {
           </span>
           <div>
             <strong>Chat with us</strong>
-            <span>+92 322 2495034</span>
+            <span>+923172841178</span>
           </div>
         </a>
       </div>
@@ -628,7 +628,7 @@ function renderStorefrontShell(mainContentHtml) {
           <a class="logo" href="/" data-nav-home="true"><span>GLASS SKIN</span><em>store</em></a>
           <p class="footer-info-line"><strong>Business Name:</strong> Glass Skin Store</p>
           <a class="footer-info-line" href="mailto:support@glassskinstore.com"><strong>Email:</strong> support@glassskinstore.com</a>
-          <a class="footer-info-line" href="tel:+923222495034"><strong>Phone:</strong> +92 322 2495034</a>
+          <a class="footer-info-line" href="tel:+923172841178"><strong>Phone:</strong> +923172841178</a>
           <p class="footer-info-line"><strong>Address:</strong> Plot R41, Hussainabad, F.B. Area, Block 2, Gulberg Town, Karachi, Pakistan</p>
           <p class="footer-trustpilot-line">Verified by real customers. Trustpilot Reviews</p>
         </div>
@@ -675,7 +675,7 @@ function renderStorefrontShell(mainContentHtml) {
       </div>
     </footer>
 
-    <a class="whatsapp" href="https://wa.me/923222495034?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Glass Skin Store on WhatsApp">◔</a>
+    <a class="whatsapp" href="https://wa.me/923172841178?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Glass Skin Store on WhatsApp">◔</a>
 
     <aside class="cart-panel">
       <div class="cart-head"><h2>Your bag</h2><button class="close-cart" aria-label="Close cart">×</button></div>
@@ -749,7 +749,7 @@ function renderStorefrontShell(mainContentHtml) {
             <p>Account number: <b>03222495034</b></p>
             <p>Account name: <b>Muhammad Imran</b></p>
             <small>Payment karne ke baad screenshot WhatsApp par bhej dein, please.</small>
-            <a href="https://wa.me/923222495034?text=${encodeURIComponent('Assalam-o-Alaikum, I have paid via EasyPaisa. I am sending my payment screenshot for order confirmation.')}" target="_blank" rel="noopener noreferrer">WhatsApp par payment screenshot bhejein →</a>
+            <a href="https://wa.me/923172841178?text=${encodeURIComponent('Assalam-o-Alaikum, I have paid via EasyPaisa. I am sending my payment screenshot for order confirmation.')}" target="_blank" rel="noopener noreferrer">WhatsApp par payment screenshot bhejein →</a>
           </div>
           <button class="button checkout-submit-btn" type="submit">
             <span>Confirm Order</span>
@@ -1000,7 +1000,7 @@ function renderHomePage() {
           <p class="contact-sub">Our team is always available to help you. Reach out directly for any product or order queries.</p>
           <div class="contact-items">
             <a class="contact-item" href="tel:+923151247533"><div class="contact-icon">📞</div><div class="contact-text"><strong>Phone</strong><span>+92 315 1247533</span></div></a>
-            <a class="contact-item" href="https://wa.me/923222495034" target="_blank"><div class="contact-icon">💬</div><div class="contact-text"><strong>WhatsApp</strong><span>+92 322 2495034</span></div></a>
+            <a class="contact-item" href="https://wa.me/923172841178" target="_blank"><div class="contact-icon">💬</div><div class="contact-text"><strong>WhatsApp</strong><span>+923172841178</span></div></a>
             <a class="contact-item" href="https://www.instagram.com/glassskinstore.pk" target="_blank"><div class="contact-icon">📸</div><div class="contact-text"><strong>Instagram</strong><span>@glassskinstore.pk</span></div></a>
           </div>
         </div>
@@ -1253,7 +1253,7 @@ function renderProductPage(productId) {
           <div class="product-description-tabs">
             <h3>Product Overview</h3>
             <p>${product.description || 'A considered beauty essential, selected for your everyday ritual. Carefully formulated to deliver visible elegance and long-lasting care.'}</p>
-            <a class="whatsapp-consult-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello! I have a question about ${product.name} (Rs. ${product.price}).`)}" target="_blank" rel="noopener noreferrer">
+            <a class="whatsapp-consult-btn" href="https://wa.me/923172841178?text=${encodeURIComponent(`Hello! I have a question about ${product.name} (Rs. ${product.price}).`)}" target="_blank" rel="noopener noreferrer">
               <span>Have a question? Chat on WhatsApp</span>
               <span>💬</span>
             </a>
@@ -1405,7 +1405,7 @@ function renderFaqsPage() {
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Glass Skin Store offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+92 322 2495034). Our team will immediately arrange a replacement or refund at no extra shipping cost.
+              Glass Skin Store offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+923172841178). Our team will immediately arrange a replacement or refund at no extra shipping cost.
             </div>
           </div>
         </div>
@@ -1454,8 +1454,8 @@ function renderFaqsPage() {
       <div style="margin-top: 36px; text-align: center; padding: 24px; background: #fdf5e6; border: 1px solid #ebdcc5; border-radius: 12px;">
         <h4 style="margin: 0 0 8px; font-size: 16px;">Have another question? Chat with us live!</h4>
         <p style="color: #666; font-size: 13px; margin: 0 0 16px;">Our customer care team is available daily from 10 AM to 10 PM.</p>
-        <a class="button" href="https://wa.me/923222495034?text=Hello!%20I%20have%20a%20question" target="_blank" rel="noopener noreferrer">
-          Chat on WhatsApp (+92 322 2495034) <span>💬</span>
+        <a class="button" href="https://wa.me/923172841178?text=Hello!%20I%20have%20a%20question" target="_blank" rel="noopener noreferrer">
+          Chat on WhatsApp (+923172841178) <span>💬</span>
         </a>
       </div>
     </div>
@@ -1533,7 +1533,7 @@ function renderDeliveryReturnsPage() {
       <div class="policy-callout-box">
         <span style="font-size:24px;">🛡️</span>
         <p>
-          <strong>Hassle-Free Guarantee:</strong> To initiate a return or exchange, simply send the order slip and a photo of the product to our WhatsApp Helpline <strong>+92 322 2495034</strong>. Our team will begin the process immediately.
+          <strong>Hassle-Free Guarantee:</strong> To initiate a return or exchange, simply send the order slip and a photo of the product to our WhatsApp Helpline <strong>+923172841178</strong>. Our team will begin the process immediately.
         </p>
       </div>
     </div>
@@ -1577,7 +1577,7 @@ function renderTrackOrderPage() {
         <div style="background:#fff; border:1px solid #eee7dd; border-radius:10px; padding:20px; text-align:center;">
           <h4 style="margin:0 0 6px; font-size:15px;">Need Live Support?</h4>
           <p style="color:#666; font-size:12.5px; margin:0 0 12px;">Get instant status updates from our courier logistics team on WhatsApp.</p>
-          <a class="button" href="https://wa.me/923222495034?text=Hello!%20I%20need%20to%20track%20my%20order%20status" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
+          <a class="button" href="https://wa.me/923172841178?text=Hello!%20I%20need%20to%20track%20my%20order%20status" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
             WhatsApp Tracker <span>💬</span>
           </a>
         </div>
@@ -2764,7 +2764,7 @@ function bindGlobalEvents() {
             <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Estimated Delivery:</strong> 2 - 4 Working Days (Free Shipping)</p>
             <div style="margin-top:16px; padding-top:12px; border-top:1px dashed #ebdcc5; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
               <span style="font-size:12px; color:#777;">Payment: <b>Cash on Delivery (COD)</b></span>
-              <a href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
+              <a href="https://wa.me/923172841178?text=${encodeURIComponent(`Hello! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
                 💬 Inquire on WhatsApp →
               </a>
             </div>

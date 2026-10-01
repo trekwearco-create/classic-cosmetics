@@ -21,6 +21,8 @@ const defaultProducts = [
 ];
 
 let products = (JSON.parse(localStorage.getItem('classic-products') || 'null') || defaultProducts).map(p => {
+  const images = Array.isArray(p.images) && p.images.length ? p.images : (p.image ? [p.image] : []);
+  p = { ...p, images, image: p.image || images[0] || '' };
   if (!p.brand) {
     const match = defaultProducts.find(dp => dp.id === p.id || dp.name === p.name);
     if (match?.brand) return { ...p, brand: match.brand };
@@ -326,7 +328,7 @@ function showThankYouModal(order) {
 
       <div class="thankyou-actions">
         <button class="button thankyou-continue-btn" id="close-thankyou-btn">Continue Shopping <span>→</span></button>
-        <a class="button whatsapp-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello Glass Skin Store! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
+        <a class="button whatsapp-btn" href="https://wa.me/923172841178?text=${encodeURIComponent(`Hello Glass Skin Store! I just placed order #${order.order_number} for Rs. ${order.total_amount}. Could you please confirm my order dispatch updates?`)}" target="_blank" rel="noopener noreferrer">
           Chat on WhatsApp <span>💬</span>
         </a>
       </div>
@@ -658,7 +660,7 @@ function renderStorefrontShell(mainContentHtml) {
       </div>
 
       <div class="mobile-menu-footer">
-        <a class="mobile-menu-whatsapp" href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">
+        <a class="mobile-menu-whatsapp" href="https://wa.me/923172841178" target="_blank" rel="noopener noreferrer">
           <span class="wa-badge-icon">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" stroke="#fff" stroke-width="1">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
@@ -666,7 +668,7 @@ function renderStorefrontShell(mainContentHtml) {
           </span>
           <div>
             <strong>Chat with us</strong>
-            <span>+92 322 2495034</span>
+            <span>+923172841178</span>
           </div>
         </a>
       </div>
@@ -686,7 +688,6 @@ function renderStorefrontShell(mainContentHtml) {
           <h2 id="footer-contact-title"><a href="/contact" data-nav-page="/contact">Contact Us</a></h2>
           <address>
             <p><strong>Phone:</strong> <a href="https://wa.me/923172841178" target="_blank" rel="noopener noreferrer">+923172841178</a></p>
-            <p><strong>Phone:</strong> <a href="https://wa.me/923222495034" target="_blank" rel="noopener noreferrer">+92 322 2495034</a></p>
             <p><strong>Address:</strong> House # 26, Usmania Society, behind Lamcy Hall, Nazimabad No. 1, Karachi</p>
             <p><strong>Email:</strong> <a href="mailto:info.glassskintore@gmail.com">info.glassskintore@gmail.com</a></p>
           </address>
@@ -702,7 +703,7 @@ function renderStorefrontShell(mainContentHtml) {
       </div>
     </footer>
 
-    <a class="whatsapp" href="https://wa.me/923222495034?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Glass Skin Store on WhatsApp">◔</a>
+    <a class="whatsapp" href="https://wa.me/923172841178?text=Hi%2C%20I%20have%20a%20question%20about%20a%20product" target="_blank" rel="noopener noreferrer" aria-label="Chat with Glass Skin Store on WhatsApp">◔</a>
 
     <aside class="cart-panel">
       <div class="cart-head"><h2>Your bag</h2><button class="close-cart" aria-label="Close cart">×</button></div>
@@ -776,7 +777,7 @@ function renderStorefrontShell(mainContentHtml) {
             <p>Account number: <b>03222495034</b></p>
             <p>Account name: <b>Muhammad Imran</b></p>
             <small>Payment karne ke baad screenshot WhatsApp par bhej dein, please.</small>
-            <a href="https://wa.me/923222495034?text=${encodeURIComponent('Assalam-o-Alaikum, I have paid via EasyPaisa. I am sending my payment screenshot for order confirmation.')}" target="_blank" rel="noopener noreferrer">WhatsApp par payment screenshot bhejein →</a>
+            <a href="https://wa.me/923172841178?text=${encodeURIComponent('Assalam-o-Alaikum, I have paid via EasyPaisa. I am sending my payment screenshot for order confirmation.')}" target="_blank" rel="noopener noreferrer">WhatsApp par payment screenshot bhejein →</a>
           </div>
           <button class="button checkout-submit-btn" type="submit">
             <span>Confirm Order</span>
@@ -1161,6 +1162,7 @@ function renderProductPage(productId) {
     `);
   }
 
+  const productImages = product.images?.length ? product.images : (product.image ? [product.image] : []);
   const discount = getDiscountPercentage(product);
   const origPrice = Number(product.originalPrice || product.compare_at_price || 0);
   const rating = product.rating || 4.8;
@@ -1194,8 +1196,21 @@ function renderProductPage(productId) {
         <div class="product-gallery-card">
           <div class="product-main-media">
             ${discount > 0 ? `<span class="discount-badge">${discount}% OFF</span>` : ''}
-            <img src="${product.image}" alt="${product.name}" />
+            <img class="product-gallery-main-image" src="${productImages[0] || ''}" alt="${product.name}" />
+            ${productImages.length > 1 ? `
+              <button class="product-gallery-step product-gallery-previous" type="button" data-gallery-step="-1" aria-label="Previous product image">‹</button>
+              <button class="product-gallery-step product-gallery-next" type="button" data-gallery-step="1" aria-label="Next product image">›</button>
+            ` : ''}
           </div>
+          ${productImages.length > 1 ? `
+            <div class="product-gallery-thumbnails" aria-label="Product images">
+              ${productImages.map((image, index) => `
+                <button class="product-gallery-thumbnail${index === 0 ? ' active' : ''}" type="button" data-gallery-image="${index}" aria-label="Show product image ${index + 1}" aria-pressed="${index === 0}">
+                  <img src="${image}" alt="" />
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
 
         <!-- Purchase & Info Column -->
@@ -1256,7 +1271,7 @@ function renderProductPage(productId) {
           <div class="product-description-tabs">
             <h3>Product Overview</h3>
             <p>${product.description || 'A considered beauty essential, selected for your everyday ritual. Carefully formulated to deliver visible elegance and long-lasting care.'}</p>
-            <a class="whatsapp-consult-btn" href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello! I have a question about ${product.name} (Rs. ${product.price}).`)}" target="_blank" rel="noopener noreferrer">
+            <a class="whatsapp-consult-btn" href="https://wa.me/923172841178?text=${encodeURIComponent(`Hello! I have a question about ${product.name} (Rs. ${product.price}).`)}" target="_blank" rel="noopener noreferrer">
               <span>Have a question? Chat on WhatsApp</span>
               <span>💬</span>
             </a>
@@ -1315,7 +1330,6 @@ function renderDocumentPage(pageDocument) {
 
 function renderContactPage() {
   const primaryWhatsApp = 'https://wa.me/923172841178';
-  const secondaryWhatsApp = 'https://wa.me/923222495034';
   const contactHtml = `
     <div class="breadcrumbs-bar">
       <div class="breadcrumbs-inner">
@@ -1341,8 +1355,6 @@ function renderContactPage() {
           <dt>Phone/WhatsApp Number</dt>
           <dd>
             <a href="${primaryWhatsApp}" target="_blank" rel="noopener noreferrer">+923172841178</a>
-            <span aria-hidden="true"> · </span>
-            <a href="${secondaryWhatsApp}" target="_blank" rel="noopener noreferrer">+92 322 2495034</a>
           </dd>
         </div>
         <div class="contact-detail-row">
@@ -1445,7 +1457,7 @@ function renderFaqsPage() {
           </button>
           <div class="faq-answer-body">
             <div class="faq-answer-inner">
-              Glass Skin Store offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+92 322 2495034). Our team will immediately arrange a replacement or refund at no extra shipping cost.
+              Glass Skin Store offers an <strong>easy 7-day return and exchange policy</strong>. If your product arrives damaged, leaked, or incorrect, simply send a photo/video along with the return slip to our WhatsApp (+923172841178). Our team will immediately arrange a replacement or refund at no extra shipping cost.
             </div>
           </div>
         </div>
@@ -1494,8 +1506,8 @@ function renderFaqsPage() {
       <div style="margin-top: 36px; text-align: center; padding: 24px; background: #fdf5e6; border: 1px solid #ebdcc5; border-radius: 12px;">
         <h4 style="margin: 0 0 8px; font-size: 16px;">Have another question? Chat with us live!</h4>
         <p style="color: #666; font-size: 13px; margin: 0 0 16px;">Our customer care team is available daily from 10 AM to 10 PM.</p>
-        <a class="button" href="https://wa.me/923222495034?text=Hello!%20I%20have%20a%20question" target="_blank" rel="noopener noreferrer">
-          Chat on WhatsApp (+92 322 2495034) <span>💬</span>
+        <a class="button" href="https://wa.me/923172841178?text=Hello!%20I%20have%20a%20question" target="_blank" rel="noopener noreferrer">
+          Chat on WhatsApp (+923172841178) <span>💬</span>
         </a>
       </div>
     </div>
@@ -1573,7 +1585,7 @@ function renderDeliveryReturnsPage() {
       <div class="policy-callout-box">
         <span style="font-size:24px;">🛡️</span>
         <p>
-          <strong>Hassle-Free Guarantee:</strong> To initiate a return or exchange, simply send the order slip and a photo of the product to our WhatsApp Helpline <strong>+92 322 2495034</strong>. Our team will begin the process immediately.
+          <strong>Hassle-Free Guarantee:</strong> To initiate a return or exchange, simply send the order slip and a photo of the product to our WhatsApp Helpline <strong>+923172841178</strong>. Our team will begin the process immediately.
         </p>
       </div>
     </div>
@@ -1617,7 +1629,7 @@ function renderTrackOrderPage() {
         <div style="background:#fff; border:1px solid #eee7dd; border-radius:10px; padding:20px; text-align:center;">
           <h4 style="margin:0 0 6px; font-size:15px;">Need Live Support?</h4>
           <p style="color:#666; font-size:12.5px; margin:0 0 12px;">Get instant status updates from our courier logistics team on WhatsApp.</p>
-          <a class="button" href="https://wa.me/923222495034?text=Hello!%20I%20need%20to%20track%20my%20order%20status" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
+          <a class="button" href="https://wa.me/923172841178?text=Hello!%20I%20need%20to%20track%20my%20order%20status" target="_blank" rel="noopener noreferrer" style="min-width:auto; padding:10px 16px; font-size:11px;">
             WhatsApp Tracker <span>💬</span>
           </a>
         </div>
@@ -1799,12 +1811,10 @@ function renderAdminViewContent() {
               <label>Cut Price (Rs.)<input name="originalPrice" type="number" min="0" placeholder="3890"/></label>
             </div>
             <label>Shade / Variant<input name="shade" placeholder="e.g. Natural Sand, 50ml"/></label>
-            <label>Product Image
-              <input name="imageFile" type="file" accept="image/*" required/>
+            <label>Product Images
+              <input name="imageFile" type="file" accept="image/*" multiple/>
             </label>
-            <div class="admin-image-preview" id="product-image-preview" style="display:none;margin:8px 0 14px;">
-              <img src="" alt="Product preview" style="max-height:120px;border-radius:12px;border:1px solid #e8dec9;box-shadow:0 3px 10px rgba(0,0,0,0.05);"/>
-              <small style="display:block;color:#888;margin-top:6px;font-size:11px;">Select new image above to replace. If nothing is selected, the current image will be kept.</small>
+            <div class="admin-product-images-preview" id="product-image-preview" data-kept-images="[]" style="display:none;margin:8px 0 14px;">
             </div>
             <label>Details<textarea name="description" rows="3" placeholder="Describe the product ritual, benefits, and formulation..."></textarea></label>
             <button class="button" type="submit">Save product <span>→</span></button>
@@ -2123,8 +2133,42 @@ function attachAdminDynamicForms() {
     });
   }
 
-  // Product image file preview
-  setupImagePreview('#product-admin-form input[name="imageFile"]', '#product-image-preview');
+  const productImageInput = document.querySelector('#product-admin-form input[name="imageFile"]');
+  const productImagePreview = document.querySelector('#product-image-preview');
+  let selectedProductImageFiles = [];
+  function renderProductImagePreview() {
+    if (!productImagePreview) return;
+    productImagePreview.querySelectorAll('[data-preview-url]').forEach(image => URL.revokeObjectURL(image.dataset.previewUrl));
+    const keptImages = JSON.parse(productImagePreview.dataset.keptImages || '[]');
+    const previewImages = [
+      ...keptImages.map((url, index) => ({ url, index, kept: true })),
+      ...selectedProductImageFiles.map((file, index) => ({ url: URL.createObjectURL(file), index, kept: false }))
+    ];
+    productImagePreview.style.display = previewImages.length ? 'grid' : 'none';
+    productImagePreview.innerHTML = previewImages.map(image => `
+      <div class="admin-product-image-item">
+        <img src="${image.url}" alt="Product image preview"${image.kept ? '' : ` data-preview-url="${image.url}"`} />
+        <button type="button" aria-label="Remove product image" data-remove-${image.kept ? 'kept' : 'selected'}-image="${image.index}">×</button>
+      </div>
+    `).join('');
+  }
+  productImageInput?.addEventListener('change', () => {
+    selectedProductImageFiles.push(...Array.from(productImageInput.files || []));
+    renderProductImagePreview();
+  });
+  productImagePreview?.addEventListener('click', event => {
+    const removeKeptButton = event.target.closest('[data-remove-kept-image]');
+    const removeSelectedButton = event.target.closest('[data-remove-selected-image]');
+    if (removeKeptButton) {
+      const keptImages = JSON.parse(productImagePreview.dataset.keptImages || '[]');
+      keptImages.splice(Number(removeKeptButton.dataset.removeKeptImage), 1);
+      productImagePreview.dataset.keptImages = JSON.stringify(keptImages);
+      renderProductImagePreview();
+    } else if (removeSelectedButton) {
+      selectedProductImageFiles.splice(Number(removeSelectedButton.dataset.removeSelectedImage), 1);
+      renderProductImagePreview();
+    }
+  });
   // Brand logo file preview
   setupImagePreview('#brand-admin-form input[name="brandLogo"]', '#brand-logo-preview');
 
@@ -2306,10 +2350,12 @@ function attachAdminDynamicForms() {
         submitButton.textContent = 'Uploading & saving…';
       }
       try {
-        const imageFile = fd.get('imageFile');
-        const uploadedImage = imageFile instanceof File && imageFile.size ? await uploadImageFile(imageFile) : '';
-        if (imageFile instanceof File && imageFile.size && !uploadedImage) throw new Error('Could not upload the selected image.');
-        const image = uploadedImage || existing?.image || 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=700&q=85';
+        const keptImages = JSON.parse(productImagePreview?.dataset.keptImages || '[]');
+        if (!keptImages.length && !selectedProductImageFiles.length) throw new Error('Please keep or select at least one product image.');
+        const uploadedImages = await Promise.all(selectedProductImageFiles.map(uploadImageFile));
+        if (uploadedImages.some(image => !image)) throw new Error('Could not upload all selected images.');
+        const images = [...keptImages, ...uploadedImages];
+        const image = images[0];
         const existingIdIsUuid = existing && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(existing.id);
         const productObj = {
           id: existingIdIsUuid ? existing.id : crypto.randomUUID(),
@@ -2320,6 +2366,7 @@ function attachAdminDynamicForms() {
           originalPrice,
           shade,
           image,
+          images,
           description,
           rating: existing?.rating || 4.9,
           reviews: existing?.reviews || 32
@@ -2347,7 +2394,7 @@ function attachAdminDynamicForms() {
             brand_id: brandId,
             price,
             stock: existing?.stock || 0,
-            images: [image],
+            images,
             status: 'in_stock'
           });
           if (productError) throw productError;
@@ -2387,16 +2434,11 @@ function attachAdminDynamicForms() {
       form.elements.price.value = p.price;
       form.elements.originalPrice.value = p.originalPrice || '';
       form.elements.shade.value = p.shade || '';
-      form.elements.imageFile.value = '';
-      form.elements.imageFile.required = !p.image;
       const preview = document.querySelector('#product-image-preview');
-      const previewImage = preview?.querySelector('img');
-      if (previewImage && p.image) {
-        previewImage.src = p.image;
-        preview.style.display = 'block';
-      } else if (preview) {
-        preview.style.display = 'none';
-      }
+      form.elements.imageFile.value = '';
+      selectedProductImageFiles = [];
+      if (preview) preview.dataset.keptImages = JSON.stringify(p.images?.length ? p.images : (p.image ? [p.image] : []));
+      renderProductImagePreview();
       form.elements.description.value = p.description || '';
       document.querySelector('#product-form-title').textContent = `Edit ${p.name}`;
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2654,6 +2696,30 @@ function bindGlobalEvents() {
 
   document.querySelector('#checkout-form')?.addEventListener('submit', submitOrder);
 
+  const productGallery = document.querySelector('.product-gallery-card');
+  if (productGallery) {
+    const productImages = products.find(product => product.id === getRoute().productId)?.images || [];
+    const mainImage = productGallery.querySelector('.product-gallery-main-image');
+    const thumbnails = Array.from(productGallery.querySelectorAll('[data-gallery-image]'));
+    let activeImageIndex = 0;
+    const showImage = index => {
+      if (!productImages.length || !mainImage) return;
+      activeImageIndex = (index + productImages.length) % productImages.length;
+      mainImage.src = productImages[activeImageIndex];
+      thumbnails.forEach((thumbnail, thumbnailIndex) => {
+        const active = thumbnailIndex === activeImageIndex;
+        thumbnail.classList.toggle('active', active);
+        thumbnail.setAttribute('aria-pressed', String(active));
+      });
+    };
+    thumbnails.forEach(thumbnail => {
+      thumbnail.addEventListener('click', () => showImage(Number(thumbnail.dataset.galleryImage)));
+    });
+    productGallery.querySelectorAll('[data-gallery-step]').forEach(button => {
+      button.addEventListener('click', () => showImage(activeImageIndex + Number(button.dataset.galleryStep)));
+    });
+  }
+
   // Single Product Page Qty & Buy Now handlers
   const qtyMinus = document.querySelector('#qty-minus');
   const qtyPlus = document.querySelector('#qty-plus');
@@ -2759,7 +2825,7 @@ function bindGlobalEvents() {
             <p style="font-size:13px; margin:6px 0; color:#555;"><strong>Estimated Delivery:</strong> 2 - 4 Working Days (Free Shipping)</p>
             <div style="margin-top:16px; padding-top:12px; border-top:1px dashed #ebdcc5; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
               <span style="font-size:12px; color:#777;">Payment: <b>Cash on Delivery (COD)</b></span>
-              <a href="https://wa.me/923222495034?text=${encodeURIComponent(`Hello! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
+              <a href="https://wa.me/923172841178?text=${encodeURIComponent(`Hello! I am inquiring about tracking for order ${orderIdDisplay}`)}" target="_blank" rel="noopener noreferrer" style="font-size:12px; color:#25d366; font-weight:700; text-decoration:none;">
                 💬 Inquire on WhatsApp →
               </a>
             </div>
