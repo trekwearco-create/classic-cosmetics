@@ -3,6 +3,7 @@ import './checkout.css';
 import './admin-management.css';
 import './storefront-pages.css';
 import { supabase, supabaseConfigured } from './supabase.js';
+import { referenceBrandNames } from './brands-seed.js';
 import footerDocuments from './footer-content.json';
 import easyPaisaLogo from './assets/easypaisa-logo.jpg';
 import jazzCashLogo from './assets/jazzcash-logo.png';
@@ -31,7 +32,7 @@ let products = (JSON.parse(localStorage.getItem('classic-products') || 'null') |
 });
 
 let categories = JSON.parse(localStorage.getItem('classic-categories') || 'null') || ['Skincare', 'Makeup', 'Fragrance', 'Bath & Body'];
-let brands = JSON.parse(localStorage.getItem('classic-brands') || 'null') || [];
+let brands = []; // Populated right below from the central Brands store (localStorage / Supabase / reference seed)
 let sections = JSON.parse(localStorage.getItem('classic-sections') || '[]');
 let cart = JSON.parse(localStorage.getItem('classic-cart') || '[]');
 let liveOrders = JSON.parse(localStorage.getItem('classic-orders') || '[]');
@@ -50,6 +51,169 @@ let isPollingActive = false;
    HELPERS
    ========================================================================== */
 export const slugify = value => (value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+/* ==========================================================================
+   CENTRAL BRANDS STORE (single source of truth)
+   Every brand rendered anywhere on the storefront — the homepage Brands
+   section, the homepage Top 5, the Brands page, category pages, product
+   cards and the admin Brands Management screen — reads from this one list.
+   ========================================================================== */
+const BRAND_SEED_FLAG = 'classic-brands-seeded';
+
+function makeUniqueBrandSlug(name, taken) {
+  const base = slugify(name) || 'brand';
+  const used = taken || new Set(brands.map(brand => brand.slug));
+  let candidate = base;
+  let counter = 1;
+  while (used.has(candidate)) {
+    counter += 1;
+    candidate = `${base}-${counter}`;
+  }
+  used.add(candidate);
+  return candidate;
+}
+
+function normalizeBrand(rawBrand, index, usedSlugs) {
+  const name = String(rawBrand?.name ?? '').trim();
+  if (!name) return null;
+  const baseSlug = slugify(rawBrand?.slug || name) || 'brand';
+  let slug = baseSlug;
+  let counter = 1;
+  while (usedSlugs.has(slug)) {
+    counter += 1;
+    slug = `${baseSlug}-${counter}`;
+  }
+  usedSlugs.add(slug);
+  return {
+    id: String(rawBrand?.id || `brand-${slug}`),
+    name,
+    slug,
+    logo: String(rawBrand?.logo || ''),
+    link: String(rawBrand?.link || ''),
+    category: String(rawBrand?.category || ''),
+    hidden: rawBrand?.hidden === true || rawBrand?.is_hidden === true,
+    order: Number.isFinite(Number(rawBrand?.order)) ? Number(rawBrand.order) : index,
+    topFive: rawBrand?.topFive === true || rawBrand?.is_top === true
+  };
+}
+
+function loadBrandsFromStore() {
+  let stored = JSON.parse(localStorage.getItem('classic-brands') || 'null');
+  if (!Array.isArray(stored)) stored = [];
+
+  // One-time migration: merge the reference brand directory together with the
+  // demo brands that already existed, so every one of them becomes editable
+  // and deletable from the admin panel (nothing stays locked or hard-coded).
+  if (localStorage.getItem(BRAND_SEED_FLAG) !== '1') {
+    const merged = [...stored];
+    const known = new Set(merged.map(brand => String(brand?.name || '').trim().toLowerCase()).filter(Boolean));
+    const addIfNew = (name, order) => {
+      const clean = String(name || '').trim();
+      const key = clean.toLowerCase();
+      if (!key || known.has(key)) return;
+      known.add(key);
+      merged.push({ name: clean, order: Number.isFinite(order) ? order : merged.length });
+    };
+    referenceBrandNames.forEach((name, index) => addIfNew(name, index));
+    products.forEach(product => addIfNew(product.brand));
+    stored.forEach(brand => addIfNew(brand?.name, brand?.order));
+    // Give the admin a sensible starting Top 5 that mirrors what the homepage
+    // already shows, so it can be replaced, reordered or removed from there.
+    if (!merged.some(brand => brand?.topFive === true)) {
+      merged.slice(0, 5).forEach(brand => { brand.topFive = true; });
+    }
+    stored = merged;
+    localStorage.setItem(BRAND_SEED_FLAG, '1');
+  }
+
+  const usedSlugs = new Set();
+  return stored
+    .map((brand, index) => normalizeBrand(brand, index, usedSlugs))
+    .filter(Boolean)
+    .sort((first, second) => first.order - second.order || first.name.localeCompare(second.name));
+}
+
+brands = loadBrandsFromStore();
+localStorage.setItem('classic-brands', JSON.stringify(brands));
+
+const sortAndReindexBrands = () => {
+  brands.sort((first, second) => first.order - second.order || first.name.localeCompare(second.name));
+  brands.forEach((brand, index) => { brand.order = index; });
+};
+
+const findBrandById = id => brands.find(brand => String(brand.id) === String(id));
+
+/* Place a brand inside the homepage Top 5 group. If five brands are already
+   selected the last one is pushed out, so the group always stays at five. */
+function placeBrandInTopFive(brand) {
+  const flagged = brands
+    .filter(item => item.id !== brand.id && item.topFive && !item.hidden)
+    .sort((first, second) => first.order - second.order);
+  if (flagged.length >= 5) {
+    const dropped = flagged[4];
+    dropped.topFive = false;
+    brand.order = dropped.order;
+  } else {
+    brand.order = flagged.length ? flagged[flagged.length - 1].order + 0.5 : 0;
+  }
+}
+
+function brandHref(brand) {
+  const custom = String(brand?.link || '').trim();
+  return custom || `/brands/${brand?.slug || slugify(brand?.name || '')}`;
+}
+
+function getBrandProductsCount(name) {
+  const key = String(name || '').trim().toLowerCase();
+  if (!key) return 0;
+  return products.filter(product => String(product.brand || '').trim().toLowerCase() === key).length;
+}
+
+function getMediaLibrary() {
+  const urls = new Set();
+  products.forEach(product => {
+    const images = Array.isArray(product.images) && product.images.length ? product.images : [product.image];
+    images.forEach(url => { if (url) urls.add(String(url)); });
+  });
+  brands.forEach(brand => { if (brand.logo) urls.add(String(brand.logo)); });
+  return [...urls];
+}
+
+/* Persist a single brand to Supabase (best effort; falls back to the
+   minimal column set when the optional columns are not present yet). */
+async function persistBrandToSupabase(brand) {
+  if (!supabaseConfigured) return;
+  try {
+    let categoryId = null;
+    if (brand.category) {
+      const { data: catRow } = await supabase.from('categories').select('id').eq('name', brand.category).maybeSingle();
+      categoryId = catRow?.id || null;
+    }
+    const basePayload = { name: brand.name, slug: brand.slug, logo_url: brand.logo || null };
+    const extendedPayload = { ...basePayload, category_id: categoryId, link: brand.link || null, is_hidden: brand.hidden, display_order: brand.order, is_top: brand.topFive };
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(brand.id);
+    const run = payload => (isUuid
+      ? supabase.from('brands').update(payload).eq('id', brand.id)
+      : supabase.from('brands').insert(payload));
+    let { error } = await run(extendedPayload);
+    if (error) ({ error } = await run({ ...basePayload, category_id: categoryId }));
+    if (error) console.warn('Supabase brand save notice:', error.message);
+  } catch (err) {
+    console.warn('Supabase brand save notice:', err);
+  }
+}
+
+async function deleteBrandFromSupabase(brand) {
+  if (!supabaseConfigured || !brand) return;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(brand.id);
+  if (!isUuid) return;
+  try {
+    const { error } = await supabase.from('brands').delete().eq('id', brand.id);
+    if (error) console.warn('Supabase brand delete notice:', error.message);
+  } catch (err) {
+    console.warn('Supabase brand delete notice:', err);
+  }
+}
 const money = value => `Rs. ${Number(value || 0).toLocaleString('en-PK')}`;
 const escapeFooterText = value => String(value).replace(/[&<>"']/g, character => ({
   '&': '&amp;',
@@ -139,22 +303,29 @@ function getAvailableBrands() {
   const brandMap = new Map();
   brands.forEach(brand => {
     const name = String(brand.name || '').trim();
-    if (name) brandMap.set(name.toLowerCase(), { ...brand, name, productCount: 0 });
+    if (!name || brand.hidden) return;
+    brandMap.set(name.toLowerCase(), { ...brand, name, productCount: 0 });
   });
 
   products.forEach(product => {
     const name = String(product.brand || '').trim();
     if (!name) return;
     const key = name.toLowerCase();
-    const brand = brandMap.get(key) || { name, logo: '', category: '', productCount: 0 };
+    const brand = brandMap.get(key) || { name, logo: '', link: '', category: '', order: brands.length, topFive: false, hidden: false, productCount: 0 };
     brand.productCount++;
     brandMap.set(key, brand);
   });
 
   return [...brandMap.values()].sort((first, second) =>
-    second.productCount - first.productCount || first.name.localeCompare(second.name)
+    (Number(first.order) || 0) - (Number(second.order) || 0) || first.name.localeCompare(second.name)
   );
 }
+
+const getTopBrands = () => {
+  const available = getAvailableBrands();
+  const flagged = available.filter(brand => brand.topFive);
+  return (flagged.length ? flagged : available).slice(0, 5);
+};
 
 function getDiscountPercentage(product) {
   const orig = Number(product.originalPrice || product.compare_at_price || 0);
@@ -494,12 +665,18 @@ function brandCard(brand) {
   const logo = brand.logo
     ? `<img src="${escapeFooterText(brand.logo)}" alt="${safeName} logo" loading="lazy" />`
     : escapeFooterText(brand.name.charAt(0).toUpperCase());
+  const href = brandHref(brand);
+  const isExternal = /^https?:\/\//i.test(href);
+  const navAttributes = isExternal
+    ? ' target="_blank" rel="noopener noreferrer"'
+    : ` data-nav-page="${escapeFooterText(href)}"`;
+  const count = Number(brand.productCount || 0);
 
   return `
-    <a class="brand-tile-card" href="/brands/${slugify(brand.name)}" data-nav-page="/brands/${slugify(brand.name)}" data-brand-name="${safeName}" data-brand-letter="${safeName.charAt(0).toUpperCase()}">
+    <a class="brand-tile-card" href="${escapeFooterText(href)}"${navAttributes} data-brand-name="${safeName}" data-brand-letter="${safeName.charAt(0).toUpperCase()}">
       <div class="brand-tile-avatar">${logo}</div>
       <strong class="brand-tile-name">${safeName}</strong>
-      <span class="brand-tile-count">${brand.productCount} product${brand.productCount === 1 ? '' : 's'}</span>
+      <span class="brand-tile-count">${count} product${count === 1 ? '' : 's'}</span>
       <span class="brand-tile-cta">Shop Brand →</span>
     </a>
   `;
@@ -863,8 +1040,7 @@ function renderStorefrontShell(mainContentHtml) {
    ========================================================================== */
 function renderHomePage() {
   const filteredCatalogue = products;
-  const allBrands = getAvailableBrands();
-  const homeBrands = allBrands.slice(0, 5);
+  const homeBrands = getTopBrands();
 
   // Active user-created sections ONLY
   const activeSections = sections.filter(s => s.is_active !== false);
@@ -899,6 +1075,32 @@ function renderHomePage() {
   }).join('');
 
   const homeHtml = `
+    <!-- Brands (first section of the homepage main content) -->
+    <section class="featured home-brands-section" id="brands">
+      <div class="section-heading row-heading shop-header-bar">
+        <div>
+          <p class="eyebrow">Explore by brand</p>
+          <h2>Brands</h2>
+        </div>
+        <div class="shop-filter-meta">
+          <span class="product-counter">${homeBrands.length} featured</span>
+          <a class="text-link" href="/brands" data-nav-page="/brands">View all brands →</a>
+        </div>
+      </div>
+
+      ${homeBrands.length > 0 ? `
+        <div class="brand-tiles-grid">
+          ${homeBrands.map(brandCard).join('')}
+        </div>
+      ` : `
+        <div class="empty-search-state" style="margin-top:20px;">
+          <div class="empty-icon">🏷️</div>
+          <h3>No brands added yet</h3>
+          <p>Add brands from the admin panel to show them here.</p>
+        </div>
+      `}
+    </section>
+
     <!-- Desktop Hero Section -->
     <div class="desktop-store-flow">
       <section class="hero">
@@ -1002,32 +1204,6 @@ function renderHomePage() {
     <!-- User-Created Custom Sections (Dynamic) -->
     ${sectionsHtml}
 
-    <!-- Featured Brands -->
-    <section class="featured" id="brands">
-      <div class="section-heading row-heading shop-header-bar">
-        <div>
-          <p class="eyebrow">Explore by brand</p>
-          <h2>Brands</h2>
-        </div>
-        <div class="shop-filter-meta">
-          <span class="product-counter">${homeBrands.length} featured</span>
-          <a class="text-link" href="/brands" data-nav-page="/brands">View all brands →</a>
-        </div>
-      </div>
-
-      ${homeBrands.length > 0 ? `
-        <div class="brand-tiles-grid">
-          ${homeBrands.map(brandCard).join('')}
-        </div>
-      ` : `
-        <div class="empty-search-state" style="margin-top:20px;">
-          <div class="empty-icon">🏷️</div>
-          <h3>No brands added yet</h3>
-          <p>Brands will appear here when products are available.</p>
-        </div>
-      `}
-    </section>
-
     <!-- Main Storefront Catalogue -->
     <section class="featured" id="shop">
       <div class="section-heading row-heading shop-header-bar">
@@ -1050,17 +1226,6 @@ function renderHomePage() {
       </div>
     </section>
 
-    <!-- Editorial Story -->
-    <section class="editorial" id="story">
-      <div class="editorial-image"><img src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1000&q=90" alt="Woman applying skincare" /></div>
-      <div class="editorial-copy">
-        <p class="eyebrow">Our philosophy</p>
-        <h2>Beauty should feel<br /><i>like a pause.</i></h2>
-        <p>We believe the small moments you give yourself matter most. Glass Skin Store brings together refined, effective beauty to turn the everyday into a personal ritual.</p>
-        <a class="text-link" href="/contact" data-nav-page="/contact">Meet Glass Skin Store →</a>
-      </div>
-    </section>
-
     <!-- Reviews -->
     <section class="reviews">
       <p class="eyebrow">Kind words</p>
@@ -1079,7 +1244,9 @@ function renderHomePage() {
    ========================================================================== */
 function renderCategoryPage(categoryName) {
   // Find all brands linked to this category
-  const matchingBrands = brands.filter(b => (b.category || '').trim().toLowerCase() === categoryName.trim().toLowerCase());
+  const matchingBrands = brands
+    .filter(b => !b.hidden && (b.category || '').trim().toLowerCase() === categoryName.trim().toLowerCase())
+    .sort((first, second) => (Number(first.order) || 0) - (Number(second.order) || 0) || first.name.localeCompare(second.name));
   const categoryProducts = products.filter(p => (p.type || '').trim().toLowerCase() === categoryName.trim().toLowerCase());
 
   const categoryHtml = `
@@ -1878,6 +2045,143 @@ function renderAdmin() {
   initOrdersRealtimeAndPolling();
 }
 
+/* ==========================================================================
+   ADMIN · BRANDS MANAGEMENT
+   The single control panel for every brand shown on the storefront.
+   ========================================================================== */
+function renderBrandsManager() {
+  const sortedBrands = [...brands].sort((first, second) =>
+    (Number(first.order) || 0) - (Number(second.order) || 0) || first.name.localeCompare(second.name)
+  );
+  const topFive = sortedBrands.filter(brand => brand.topFive && !brand.hidden).slice(0, 5);
+  const mediaLibrary = getMediaLibrary();
+  const brandInitial = brand => escapeFooterText(String(brand.name || 'B').charAt(0).toUpperCase());
+  const brandThumb = brand => (brand.logo
+    ? `<img src="${escapeFooterText(brand.logo)}" alt="${escapeFooterText(brand.name)} logo" loading="lazy"/>`
+    : `<i>${brandInitial(brand)}</i>`);
+
+  return `
+    <section class="brands-manager">
+      <article class="admin-card">
+        <p class="eyebrow">Brands Management</p>
+        <h2 id="brand-form-title">Add brand</h2>
+        <p class="brand-manager-hint">Every brand on the storefront reads from this one list — homepage Brands section, Top 5, the Brands page and category pages. Changes apply to desktop and mobile automatically.</p>
+        <form id="brand-admin-form" class="manager-form brand-manager-form">
+          <input type="hidden" name="brandId" value=""/>
+          <input type="hidden" name="brandLogo" value=""/>
+          <label>Brand name <span class="req">*</span>
+            <input name="name" required placeholder="e.g. Garnier, Nivea, CeraVe"/>
+          </label>
+          <label>Category (optional)
+            <select name="category">
+              <option value="">No category</option>
+              ${categories.map(category => `<option value="${escapeFooterText(category)}">${escapeFooterText(category)}</option>`).join('')}
+            </select>
+          </label>
+          <label>Collection / product link (optional)
+            <input name="link" placeholder="Leave blank to open this brand's own page"/>
+          </label>
+
+          <div class="brand-logo-field">
+            <span class="brand-logo-label">Logo / image (optional — no link required)</span>
+            <div class="brand-logo-picker">
+              <div class="admin-image-preview brand-logo-preview" id="brand-logo-preview" style="display:none;">
+                <img id="brand-logo-preview-img" src="" alt="Brand logo preview"/>
+              </div>
+              <div class="brand-logo-actions">
+                <button type="button" class="brand-logo-btn" id="brand-logo-gallery-open">🖼 Media library</button>
+                <label class="brand-logo-btn brand-logo-upload">⬆ Upload from device
+                  <input type="file" id="brand-logo-file" accept="image/*" hidden/>
+                </label>
+                <button type="button" class="brand-logo-btn brand-logo-clear" id="brand-logo-clear">✕ Remove</button>
+              </div>
+            </div>
+            <input name="brandLogoUrl" class="brand-logo-url" placeholder="...or paste an image URL (optional)"/>
+            <div class="brand-gallery" id="brand-image-gallery" hidden>
+              <div class="brand-gallery-head"><strong>Media library</strong><button type="button" id="brand-gallery-close">✕</button></div>
+              <div class="brand-gallery-grid">
+                ${mediaLibrary.length
+                  ? mediaLibrary.map(url => `<button type="button" class="brand-gallery-item" data-gallery-pick="${escapeFooterText(url)}"><img src="${escapeFooterText(url)}" alt="Media option" loading="lazy"/></button>`).join('')
+                  : '<p class="brand-gallery-empty">No media yet — upload an image from your device.</p>'}
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-form-row">
+            <label>Display order
+              <input name="order" type="number" min="0" placeholder="Auto"/>
+            </label>
+            <label class="brand-checkbox"><input type="checkbox" name="topFive"/> Homepage Top 5</label>
+            <label class="brand-checkbox"><input type="checkbox" name="hidden"/> Hide from storefront</label>
+          </div>
+
+          <div class="brand-form-actions">
+            <button class="button" type="submit">Save brand <span>→</span></button>
+            <button type="button" class="brand-cancel-edit" id="brand-cancel-edit" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="admin-card">
+        <p class="eyebrow">Homepage Top 5</p>
+        <h2>Top brands</h2>
+        <p class="brand-manager-hint">These brands appear first in the homepage Brands section on desktop and mobile. Reorder, replace or remove them here.</p>
+        <div class="brand-top5-list">
+          ${topFive.length ? topFive.map((brand, index) => `
+            <div class="brand-top5-item">
+              <span class="brand-top5-rank">${index + 1}</span>
+              <span class="brand-manager-logo">${brandThumb(brand)}</span>
+              <strong>${escapeFooterText(brand.name)}</strong>
+              <span class="brand-top5-actions">
+                <button data-top5-move="-1" data-brand-id="${escapeFooterText(brand.id)}" aria-label="Move up">↑</button>
+                <button data-top5-move="1" data-brand-id="${escapeFooterText(brand.id)}" aria-label="Move down">↓</button>
+                <button data-top5-remove="${escapeFooterText(brand.id)}">Remove</button>
+              </span>
+            </div>
+          `).join('') : '<p class="empty-state">No Top 5 brands selected. Tick “Homepage Top 5” on any brand below.</p>'}
+        </div>
+      </article>
+
+      <article class="admin-card brands-list-card">
+        <div class="card-title">
+          <div><p class="eyebrow">All brands (${brands.length})</p><h2>Brand directory</h2></div>
+          <button class="add-product" id="brand-reseed-btn" type="button">↺ Load reference brands</button>
+        </div>
+        <div class="brands-list-tools">
+          <input id="brand-admin-search" type="search" placeholder="Search brands..." autocomplete="off"/>
+          <span id="brand-admin-count">${brands.length} brands</span>
+        </div>
+        <div class="manager-list brand-manager-list" id="brand-manager-list">
+          ${sortedBrands.map(brand => `
+            <div class="brand-manager-row ${brand.hidden ? 'is-hidden' : ''}" data-brand-row="${escapeFooterText(brand.id)}">
+              <span class="brand-manager-logo">${brandThumb(brand)}</span>
+              <span class="brand-manager-info">
+                <strong>${escapeFooterText(brand.name)}</strong>
+                <small>${brand.category ? `${escapeFooterText(brand.category)} · ` : ''}${getBrandProductsCount(brand.name)} product${getBrandProductsCount(brand.name) === 1 ? '' : 's'} · order ${brand.order}${brand.topFive ? ' · ★ Top 5' : ''}${brand.hidden ? ' · hidden' : ''}</small>
+                <small class="brand-manager-link">${escapeFooterText(brandHref(brand))}</small>
+              </span>
+              <span class="brand-manager-actions">
+                <button data-brand-edit="${escapeFooterText(brand.id)}">Edit</button>
+                <button data-brand-toggle-top="${escapeFooterText(brand.id)}">${brand.topFive ? '★ Top 5' : '☆ Top 5'}</button>
+                <button data-brand-toggle-hidden="${escapeFooterText(brand.id)}">${brand.hidden ? 'Show' : 'Hide'}</button>
+                <button data-brand-move="${escapeFooterText(brand.id)}" data-brand-direction="-1" aria-label="Move up">↑</button>
+                <button data-brand-move="${escapeFooterText(brand.id)}" data-brand-direction="1" aria-label="Move down">↓</button>
+                <button data-brand-delete="${escapeFooterText(brand.id)}" style="color:#d9534f;">Delete</button>
+              </span>
+            </div>
+          `).join('') || '<p class="empty-state">No brands yet. Add one on the left or load the reference brands.</p>'}
+        </div>
+      </article>
+    </section>
+  `;
+}
+
+function refreshAdminContent() {
+  const content = document.querySelector('#admin-view-content');
+  if (content) content.innerHTML = renderAdminViewContent();
+  attachAdminDynamicForms();
+}
+
 function renderAdminViewContent() {
   if (adminView === 'overview') {
     const revenue = liveOrders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
@@ -1990,51 +2294,7 @@ function renderAdminViewContent() {
   }
 
   if (adminView === 'brands') {
-    return `
-      <section class="manager-grid">
-        <article class="admin-card">
-          <p class="eyebrow">Sub-Categories / Brands</p>
-          <h2>Add Brand</h2>
-          <form id="brand-admin-form" class="manager-form">
-            <label>Category
-              <select name="category" required>
-                ${categories.map(c => `<option value="${c}">${c}</option>`).join('')}
-              </select>
-            </label>
-            <label>Brand Name
-              <input name="name" required placeholder="e.g. Garnier, Nivea, CeraVe"/>
-            </label>
-            <label>Brand Logo (Optional)
-              <input name="brandLogo" type="file" accept="image/*"/>
-            </label>
-            <div class="admin-image-preview" id="brand-logo-preview" style="display:none;margin:8px 0 14px;">
-              <img src="" alt="Brand logo preview" style="max-height:90px;max-width:220px;object-fit:contain;border-radius:12px;border:1px solid #e8dec9;padding:8px;background:#fff;"/>
-              <small style="display:block;color:#888;margin-top:6px;font-size:11px;">Square or wide logos work best. Will appear on the homepage brand cards and brand page.</small>
-            </div>
-            <button class="button" type="submit">Add brand <span>→</span></button>
-          </form>
-        </article>
-
-        <article class="admin-card">
-          <p class="eyebrow">Active Brands (${brands.length})</p>
-          <h2>Brand Directory</h2>
-          <div class="manager-list">
-            ${brands.length ? brands.map((b, idx) => `
-              <div>
-                <span>
-                  ${b.logo ? `<img src="${b.logo}" alt="${b.name}" style="width:38px;height:38px;object-fit:contain;margin-right:10px;border-radius:8px;border:1px solid #eee;background:#fff;padding:3px;"/>` : ''}
-                  <strong>${b.name}</strong><small>${b.category}</small>
-                </span>
-                <span>
-                  <button data-rename-brand="${idx}">Rename</button>
-                  <button data-delete-brand="${idx}" style="color:#d9534f;">Delete</button>
-                </span>
-              </div>
-            `).join('') : '<p class="empty-state">No brands added yet. Add a brand on the left.</p>'}
-          </div>
-        </article>
-      </section>
-    `;
+    return renderBrandsManager();
   }
 
   // ISSUE #1: Standalone Sections Management Tab
@@ -2241,20 +2501,6 @@ function attachAdminDynamicForms() {
     });
   }
 
-  function setupImagePreview(inputSelector, previewSelector, imageAttr = 'src') {
-    const input = document.querySelector(inputSelector);
-    const previewWrap = document.querySelector(previewSelector);
-    if (!input || !previewWrap) return;
-    input.addEventListener('change', () => {
-      const file = input.files?.[0];
-      const img = previewWrap.querySelector('img');
-      if (!file || !img) { previewWrap.style.display = 'none'; return; }
-      const reader = new FileReader();
-      reader.onload = () => { img.setAttribute(imageAttr, reader.result); previewWrap.style.display = 'block'; };
-      reader.readAsDataURL(file);
-    });
-  }
-
   const productImageInput = document.querySelector('#product-admin-form input[name="imageFile"]');
   const productImagePreview = document.querySelector('#product-image-preview');
   let selectedProductImageFiles = [];
@@ -2291,9 +2537,6 @@ function attachAdminDynamicForms() {
       renderProductImagePreview();
     }
   });
-  // Brand logo file preview
-  setupImagePreview('#brand-admin-form input[name="brandLogo"]', '#brand-logo-preview');
-
   // Section Type Selector Toggle
   const secTypeSelect = document.querySelector('#section-type-select');
   if (secTypeSelect) {
@@ -2408,47 +2651,257 @@ function attachAdminDynamicForms() {
     };
   }
 
-  // Brand Admin Form
+  /* ---------------- Brands Management ---------------- */
   const brandForm = document.querySelector('#brand-admin-form');
+  const brandLogoHiddenInput = brandForm?.querySelector('input[name="brandLogo"]');
+  const brandLogoUrlInput = brandForm?.querySelector('input[name="brandLogoUrl"]');
+  const brandLogoPreview = document.querySelector('#brand-logo-preview');
+  const brandLogoPreviewImg = document.querySelector('#brand-logo-preview-img');
+  const brandGallery = document.querySelector('#brand-image-gallery');
+  const brandFormTitle = document.querySelector('#brand-form-title');
+  const brandCancelEdit = document.querySelector('#brand-cancel-edit');
+
+  const setBrandLogo = url => {
+    const value = String(url || '');
+    if (brandLogoHiddenInput) brandLogoHiddenInput.value = value;
+    if (brandLogoPreviewImg) brandLogoPreviewImg.src = value;
+    if (brandLogoPreview) brandLogoPreview.style.display = value ? 'block' : 'none';
+  };
+
+  const resetBrandForm = () => {
+    if (!brandForm) return;
+    brandForm.reset();
+    brandForm.elements.brandId.value = '';
+    if (brandLogoUrlInput) brandLogoUrlInput.value = '';
+    setBrandLogo('');
+    if (brandFormTitle) brandFormTitle.textContent = 'Add brand';
+    if (brandCancelEdit) brandCancelEdit.hidden = true;
+  };
+
   if (brandForm) {
-    brandForm.onsubmit = async (e) => {
-      e.preventDefault();
+    brandLogoUrlInput?.addEventListener('input', () => setBrandLogo(brandLogoUrlInput.value.trim()));
+
+    document.querySelector('#brand-logo-gallery-open')?.addEventListener('click', () => {
+      if (brandGallery) brandGallery.hidden = !brandGallery.hidden;
+    });
+    document.querySelector('#brand-gallery-close')?.addEventListener('click', () => {
+      if (brandGallery) brandGallery.hidden = true;
+    });
+    brandGallery?.addEventListener('click', event => {
+      const pick = event.target.closest('[data-gallery-pick]');
+      if (!pick) return;
+      if (brandLogoUrlInput) brandLogoUrlInput.value = '';
+      setBrandLogo(pick.dataset.galleryPick);
+      brandGallery.hidden = true;
+      showToast('Logo selected from the media library.');
+    });
+    document.querySelector('#brand-logo-clear')?.addEventListener('click', () => {
+      if (brandLogoUrlInput) brandLogoUrlInput.value = '';
+      const fileInput = document.querySelector('#brand-logo-file');
+      if (fileInput) fileInput.value = '';
+      setBrandLogo('');
+    });
+    document.querySelector('#brand-logo-file')?.addEventListener('change', async event => {
+      const file = event.currentTarget.files?.[0];
+      if (!file) return;
+      try {
+        showToast('Uploading logo…');
+        const url = await uploadImageFile(file, 'product-images');
+        if (!url) throw new Error('Upload failed.');
+        if (brandLogoUrlInput) brandLogoUrlInput.value = '';
+        setBrandLogo(url);
+        showToast('Logo uploaded — now save the brand.');
+      } catch (err) {
+        console.error('Brand logo upload failed:', err);
+        showToast(`Logo upload failed: ${err instanceof Error ? err.message : 'Please try again.'}`);
+      }
+    });
+    brandCancelEdit?.addEventListener('click', resetBrandForm);
+
+    brandForm.onsubmit = async event => {
+      event.preventDefault();
       const fd = new FormData(brandForm);
-      const category = fd.get('category')?.toString() || '';
-      const name = fd.get('name')?.toString().trim() || '';
-      if (!name || brands.some(b => b.category === category && b.name.toLowerCase() === name.toLowerCase())) {
-        return showToast('Brand already exists in this category.');
+      const id = String(fd.get('brandId') || '');
+      const name = String(fd.get('name') || '').trim();
+      const category = String(fd.get('category') || '');
+      const link = String(fd.get('link') || '').trim();
+      const logo = String(fd.get('brandLogo') || '').trim();
+      const hidden = fd.get('hidden') === 'on';
+      const topFive = fd.get('topFive') === 'on';
+      const orderRaw = String(fd.get('order') || '').trim();
+      if (!name) return showToast('Brand name is required.');
+      if (brands.some(brand => brand.id !== id && brand.name.trim().toLowerCase() === name.toLowerCase())) {
+        return showToast('A brand with this name already exists.');
       }
       const submitButton = brandForm.querySelector('button[type="submit"]');
       if (submitButton) submitButton.disabled = true;
       try {
-        const logoFile = fd.get('brandLogo');
-        const logo = logoFile instanceof File && logoFile.size ? await uploadImageFile(logoFile) : '';
-        const newBrand = { id: crypto.randomUUID(), name, category, logo };
-        if (supabaseConfigured) {
-          const { data: catRow, error: categoryError } = await supabase.from('categories').select('id').eq('name', category).maybeSingle();
-          if (categoryError) throw categoryError;
-          if (!catRow) throw new Error(`Category "${category}" was not found in Supabase.`);
-          const { data: brandRow, error: brandError } = await supabase.from('brands')
-            .insert({ name, slug: slugify(name), category_id: catRow.id, logo_url: logo || null })
-            .select('id')
-            .single();
-          if (brandError) throw brandError;
-          newBrand.id = brandRow.id;
-        }
-        brands.push(newBrand);
+        const existing = id ? findBrandById(id) : null;
+        const payload = {
+          id: existing?.id || crypto.randomUUID(),
+          name,
+          slug: existing?.slug || makeUniqueBrandSlug(name),
+          logo,
+          link,
+          category,
+          hidden,
+          order: orderRaw !== '' ? Number(orderRaw) : (existing ? Number(existing.order) : brands.length),
+          topFive
+        };
+        if (payload.topFive && orderRaw === '') placeBrandInTopFive(payload);
+        if (existing) Object.assign(existing, payload);
+        else brands.push(payload);
+        sortAndReindexBrands();
         saveAdminData();
-        showToast(`Brand "${name}" added under ${category}.`);
-        const content = document.querySelector('#admin-view-content');
-        if (content) content.innerHTML = renderAdminViewContent();
-        attachAdminDynamicForms();
+        await persistBrandToSupabase(existing || payload);
+        showToast(existing ? `Brand "${name}" updated.` : `Brand "${name}" added.`);
+        refreshAdminContent();
       } catch (err) {
         console.error('Brand save failed:', err);
         showToast(`Brand save failed: ${err instanceof Error ? err.message : 'Please try again.'}`);
-      } finally {
         if (submitButton) submitButton.disabled = false;
       }
     };
+  }
+
+  const moveBrandBy = (brand, direction) => {
+    if (!brand) return;
+    const sorted = [...brands].sort((first, second) => first.order - second.order || first.name.localeCompare(second.name));
+    const index = sorted.findIndex(item => item.id === brand.id);
+    const neighbour = sorted[index + Number(direction)];
+    if (!neighbour) return;
+    const swap = brand.order;
+    brand.order = neighbour.order;
+    neighbour.order = swap;
+  };
+
+  document.querySelectorAll('[data-brand-edit]').forEach(btn => {
+    btn.onclick = () => {
+      const brand = findBrandById(btn.dataset.brandEdit);
+      if (!brand || !brandForm) return;
+      brandForm.elements.brandId.value = brand.id;
+      brandForm.elements.name.value = brand.name;
+      const categorySelect = brandForm.elements.category;
+      if (categorySelect) {
+        if (brand.category && ![...categorySelect.options].some(option => option.value === brand.category)) {
+          categorySelect.appendChild(new Option(brand.category, brand.category));
+        }
+        categorySelect.value = brand.category || '';
+      }
+      brandForm.elements.link.value = brand.link || '';
+      brandForm.elements.order.value = brand.order;
+      brandForm.elements.topFive.checked = brand.topFive;
+      brandForm.elements.hidden.checked = brand.hidden;
+      if (brandLogoUrlInput) brandLogoUrlInput.value = /^(https?:|data:|\/)/.test(brand.logo) ? brand.logo : '';
+      setBrandLogo(brand.logo);
+      if (brandFormTitle) brandFormTitle.textContent = `Edit ${brand.name}`;
+      if (brandCancelEdit) brandCancelEdit.hidden = false;
+      brandForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+  });
+
+  document.querySelectorAll('[data-brand-toggle-hidden]').forEach(btn => {
+    btn.onclick = async () => {
+      const brand = findBrandById(btn.dataset.brandToggleHidden);
+      if (!brand) return;
+      brand.hidden = !brand.hidden;
+      saveAdminData();
+      await persistBrandToSupabase(brand);
+      refreshAdminContent();
+      showToast(`Brand "${brand.name}" is now ${brand.hidden ? 'hidden' : 'visible'}.`);
+    };
+  });
+
+  document.querySelectorAll('[data-brand-toggle-top]').forEach(btn => {
+    btn.onclick = async () => {
+      const brand = findBrandById(btn.dataset.brandToggleTop);
+      if (!brand) return;
+      brand.topFive = !brand.topFive;
+      if (brand.topFive) placeBrandInTopFive(brand);
+      sortAndReindexBrands();
+      saveAdminData();
+      await persistBrandToSupabase(brand);
+      refreshAdminContent();
+      showToast(brand.topFive ? `"${brand.name}" added to the homepage Top 5.` : `"${brand.name}" removed from the homepage Top 5.`);
+    };
+  });
+
+  document.querySelectorAll('[data-brand-move]').forEach(btn => {
+    btn.onclick = () => {
+      moveBrandBy(findBrandById(btn.dataset.brandMove), btn.dataset.brandDirection);
+      sortAndReindexBrands();
+      saveAdminData();
+      refreshAdminContent();
+    };
+  });
+
+  document.querySelectorAll('[data-top5-move]').forEach(btn => {
+    btn.onclick = () => {
+      const brand = findBrandById(btn.dataset.brandId);
+      if (!brand) return;
+      const flagged = brands.filter(item => item.topFive && !item.hidden).sort((first, second) => first.order - second.order);
+      const index = flagged.findIndex(item => item.id === brand.id);
+      const neighbour = flagged[index + Number(btn.dataset.top5Move)];
+      if (!neighbour) return;
+      const swap = brand.order;
+      brand.order = neighbour.order;
+      neighbour.order = swap;
+      sortAndReindexBrands();
+      saveAdminData();
+      refreshAdminContent();
+    };
+  });
+
+  document.querySelectorAll('[data-top5-remove]').forEach(btn => {
+    btn.onclick = () => {
+      const brand = findBrandById(btn.dataset.top5Remove);
+      if (!brand) return;
+      brand.topFive = false;
+      saveAdminData();
+      refreshAdminContent();
+      showToast(`"${brand.name}" removed from the homepage Top 5.`);
+    };
+  });
+
+  document.querySelector('#brand-reseed-btn')?.addEventListener('click', () => {
+    const known = new Set(brands.map(brand => brand.name.trim().toLowerCase()));
+    let added = 0;
+    referenceBrandNames.forEach(name => {
+      const key = name.trim().toLowerCase();
+      if (!key || known.has(key)) return;
+      known.add(key);
+      brands.push({
+        id: crypto.randomUUID(),
+        name,
+        slug: makeUniqueBrandSlug(name),
+        logo: '',
+        link: '',
+        category: '',
+        hidden: false,
+        order: brands.length,
+        topFive: false
+      });
+      added += 1;
+    });
+    sortAndReindexBrands();
+    saveAdminData();
+    refreshAdminContent();
+    showToast(added ? `${added} reference brand${added === 1 ? '' : 's'} loaded.` : 'All reference brands are already in your list.');
+  });
+
+  const brandAdminSearch = document.querySelector('#brand-admin-search');
+  if (brandAdminSearch) {
+    brandAdminSearch.addEventListener('input', () => {
+      const query = brandAdminSearch.value.trim().toLowerCase();
+      let visibleCount = 0;
+      document.querySelectorAll('#brand-manager-list [data-brand-row]').forEach(row => {
+        const matches = !query || row.textContent.toLowerCase().includes(query);
+        row.hidden = !matches;
+        if (matches) visibleCount += 1;
+      });
+      const counter = document.querySelector('#brand-admin-count');
+      if (counter) counter.textContent = `${visibleCount} shown`;
+    });
   }
 
   // Product Admin Form
@@ -2582,18 +3035,17 @@ function attachAdminDynamicForms() {
     };
   });
 
-  // Delete Brand Button
-  document.querySelectorAll('[data-delete-brand]').forEach(btn => {
-    btn.onclick = () => {
-      const idx = Number(btn.dataset.deleteBrand);
-      if (brands[idx] && confirm(`Delete brand "${brands[idx].name}"?`)) {
-        brands.splice(idx, 1);
-        saveAdminData();
-        const content = document.querySelector('#admin-view-content');
-        if (content) content.innerHTML = renderAdminViewContent();
-        attachAdminDynamicForms();
-        showToast('Brand deleted.');
-      }
+  document.querySelectorAll('[data-brand-delete]').forEach(btn => {
+    btn.onclick = async () => {
+      const brand = findBrandById(btn.dataset.brandDelete);
+      if (!brand || !confirm(`Delete brand "${brand.name}"? It will be removed from every page.`)) return;
+      const index = brands.findIndex(item => item.id === brand.id);
+      if (index >= 0) brands.splice(index, 1);
+      sortAndReindexBrands();
+      saveAdminData();
+      await deleteBrandFromSupabase(brand);
+      refreshAdminContent();
+      showToast(`Brand "${brand.name}" deleted.`);
     };
   });
 
@@ -3203,7 +3655,20 @@ async function syncFromSupabase() {
     ]);
 
     if (catData?.length) categories = catData.map(c => c.name);
-    if (brandData?.length) brands = brandData.map(b => ({ id: b.id, name: b.name, category: b.categories?.name || '', logo: b.logo_url || b.logo || '' }));
+    if (brandData?.length) {
+      brands = brandData.map((b, index) => ({
+        id: b.id,
+        name: b.name,
+        slug: b.slug || slugify(b.name),
+        category: b.categories?.name || '',
+        logo: b.logo_url || b.logo || '',
+        link: b.link || '',
+        hidden: b.is_hidden === true,
+        order: Number.isFinite(Number(b.display_order)) ? Number(b.display_order) : index,
+        topFive: b.is_top === true
+      }));
+      localStorage.setItem(BRAND_SEED_FLAG, '1');
+    }
     if (prodData?.length) {
       products = prodData.map(p => ({
         ...p,
