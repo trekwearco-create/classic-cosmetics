@@ -10,6 +10,91 @@
   display: block;
 }
 
+.desktop-search-panel {
+  position: absolute;
+  top: calc(100% + 1px);
+  right: 5.5%;
+  z-index: 30;
+  width: min(380px, calc(100vw - 32px));
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #ebe5dc;
+  box-shadow: 0 12px 30px rgba(34, 31, 27, 0.14);
+}
+.desktop-search-panel[hidden],
+.desktop-search-results[hidden] {
+  display: none;
+}
+#desktop-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #ded5c8;
+  border-radius: 3px;
+  outline: none;
+  background: #fbf9f6;
+  color: var(--ink);
+  font-size: 13px;
+}
+#desktop-search-input:focus {
+  border-color: var(--gold);
+  background: #fff;
+}
+.desktop-search-results {
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  margin-top: 8px;
+}
+.desktop-search-result {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 7px 2px;
+  border-bottom: 1px solid #f0eae1;
+}
+.desktop-search-result:last-child {
+  border-bottom: 0;
+}
+.desktop-search-result:hover strong {
+  color: #98773f;
+}
+.desktop-search-result img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  background: #fbf9f6;
+}
+.desktop-search-result span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.desktop-search-result strong,
+.desktop-search-result small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desktop-search-result strong {
+  font-size: 12px;
+}
+.desktop-search-result small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.desktop-search-result b {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.desktop-search-empty {
+  margin: 0;
+  padding: 14px 4px 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 /* Highfy-style modern product cards (Base / Desktop) */
 .products {
   display: grid;

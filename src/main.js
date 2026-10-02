@@ -135,6 +135,27 @@ function getCategoryImage(categoryName) {
   return 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=300&q=80';
 }
 
+function getAvailableBrands() {
+  const brandMap = new Map();
+  brands.forEach(brand => {
+    const name = String(brand.name || '').trim();
+    if (name) brandMap.set(name.toLowerCase(), { ...brand, name, productCount: 0 });
+  });
+
+  products.forEach(product => {
+    const name = String(product.brand || '').trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    const brand = brandMap.get(key) || { name, logo: '', category: '', productCount: 0 };
+    brand.productCount++;
+    brandMap.set(key, brand);
+  });
+
+  return [...brandMap.values()].sort((first, second) =>
+    second.productCount - first.productCount || first.name.localeCompare(second.name)
+  );
+}
+
 function getDiscountPercentage(product) {
   const orig = Number(product.originalPrice || product.compare_at_price || 0);
   const price = Number(product.price);
@@ -159,6 +180,14 @@ function getRoute() {
 
   if (path.startsWith('/admin') || search.get('view') === 'admin') {
     return { view: 'admin' };
+  }
+
+  if (path === '/brands' || path === '/brands/') return { view: 'brands' };
+  const allBrandMatch = path.match(/^\/brands\/([^/]+)\/?$/);
+  if (allBrandMatch) {
+    const rawBrand = decodeURIComponent(allBrandMatch[1]);
+    const brandName = getAvailableBrands().find(brand => slugify(brand.name) === slugify(rawBrand))?.name || rawBrand;
+    return { view: 'all-brand', brand: brandName };
   }
 
   // Standalone Product Page
@@ -460,6 +489,22 @@ function productCard(product) {
   `;
 }
 
+function brandCard(brand) {
+  const safeName = escapeFooterText(brand.name);
+  const logo = brand.logo
+    ? `<img src="${escapeFooterText(brand.logo)}" alt="${safeName} logo" loading="lazy" />`
+    : escapeFooterText(brand.name.charAt(0).toUpperCase());
+
+  return `
+    <a class="brand-tile-card" href="/brands/${slugify(brand.name)}" data-nav-page="/brands/${slugify(brand.name)}" data-brand-name="${safeName}" data-brand-letter="${safeName.charAt(0).toUpperCase()}">
+      <div class="brand-tile-avatar">${logo}</div>
+      <strong class="brand-tile-name">${safeName}</strong>
+      <span class="brand-tile-count">${brand.productCount} product${brand.productCount === 1 ? '' : 's'}</span>
+      <span class="brand-tile-cta">Shop Brand →</span>
+    </a>
+  `;
+}
+
 /* ==========================================================================
    COMMON LAYOUT SHELL (Header, Drawers, Footer)
    ========================================================================== */
@@ -477,12 +522,13 @@ function renderStorefrontShell(mainContentHtml) {
         <img src="${storeLogo}" alt="Glass Skin Store" />
       </a>
       <nav class="desktop-only">
-        <a href="/" data-nav-home="true">Home</a>
+        <a href="/" data-nav-home="true">Glass Skin Store</a>
         ${categories.map(cat => `<a href="/category/${slugify(cat)}" data-nav-category="${cat}">${cat}</a>`).join('')}
+        <a href="/brands" data-nav-page="/brands">Brands</a>
         <a href="/contact" data-nav-page="/contact">Contact</a>
       </nav>
       <div class="header-actions">
-        <button class="desktop-only" aria-label="Search" onclick="document.querySelector('#mobile-search-input')?.focus()">⌕</button>
+        <button class="desktop-only" id="desktop-search-toggle" aria-label="Search products" aria-expanded="false" aria-controls="desktop-search-panel">⌕</button>
         <a href="/admin" class="desktop-only" aria-label="Admin" title="Admin Portal" style="font-size:14px;color:inherit;">♙</a>
         <button class="cart-trigger" aria-label="Open cart">
           <svg class="bag-svg-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -492,6 +538,12 @@ function renderStorefrontShell(mainContentHtml) {
           </svg>
           <b class="cart-count-badge">${cartCount()}</b>
         </button>
+      </div>
+      <div class="desktop-search-panel desktop-only" id="desktop-search-panel" hidden>
+        <form id="desktop-search-form" role="search">
+          <input type="search" id="desktop-search-input" placeholder="Search products or brands..." value="${searchQuery}" autocomplete="off" aria-label="Search products and brands" aria-controls="desktop-search-results" />
+        </form>
+        <div class="desktop-search-results" id="desktop-search-results" aria-live="polite" hidden></div>
       </div>
     </header>
 
@@ -522,8 +574,16 @@ function renderStorefrontShell(mainContentHtml) {
                 </svg>
               </span>
               <div class="mobile-menu-text">
-                <strong>Home</strong>
+                <strong>Glass Skin Store</strong>
                 <span>Main storefront</span>
+              </div>
+              <span class="mobile-menu-arrow">›</span>
+            </a>
+            <a href="/brands" data-nav-page="/brands" class="mobile-menu-item">
+              <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#c6a664,#e4d4b8); color:#2a2214; font-weight:700;">B</span>
+              <div class="mobile-menu-text">
+                <strong>Brands</strong>
+                <span>Browse all brands</span>
               </div>
               <span class="mobile-menu-arrow">›</span>
             </a>
@@ -657,21 +717,21 @@ function renderStorefrontShell(mainContentHtml) {
             </a>
           </nav>
         </div>
-      </div>
-
-      <div class="mobile-menu-footer">
-        <a class="mobile-menu-whatsapp" href="https://wa.me/923172841178" target="_blank" rel="noopener noreferrer">
-          <span class="wa-badge-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" stroke="#fff" stroke-width="1">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
+        <a href="/track-order" data-nav-page="/track-order" class="mobile-menu-item mobile-track-order-link">
+          <span class="mobile-menu-icon" style="background: linear-gradient(135deg,#74b9ff,#0984e3);">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </span>
-          <div>
-            <strong>Chat with us</strong>
-            <span>+923172841178</span>
+          <div class="mobile-menu-text">
+            <strong>Track Your Order</strong>
+            <span>Check your order status</span>
           </div>
+          <span class="mobile-menu-arrow">›</span>
         </a>
       </div>
+
     </aside>
 
     <main id="main-content">
@@ -803,6 +863,8 @@ function renderStorefrontShell(mainContentHtml) {
    ========================================================================== */
 function renderHomePage() {
   const filteredCatalogue = products;
+  const allBrands = getAvailableBrands();
+  const homeBrands = allBrands.slice(0, 5);
 
   // Active user-created sections ONLY
   const activeSections = sections.filter(s => s.is_active !== false);
@@ -940,40 +1002,28 @@ function renderHomePage() {
     <!-- User-Created Custom Sections (Dynamic) -->
     ${sectionsHtml}
 
-    <!-- Dynamic Available Brands Section (Admin Managed) -->
+    <!-- Featured Brands -->
     <section class="featured" id="brands">
       <div class="section-heading row-heading shop-header-bar">
         <div>
-          <p class="eyebrow">Our Partners</p>
-          <h2>Available Brands</h2>
+          <p class="eyebrow">Explore by brand</p>
+          <h2>Brands</h2>
         </div>
         <div class="shop-filter-meta">
-          <span class="product-counter">${brands.length} brand${brands.length === 1 ? '' : 's'}</span>
+          <span class="product-counter">${homeBrands.length} featured</span>
+          <a class="text-link" href="/brands" data-nav-page="/brands">View all brands →</a>
         </div>
       </div>
 
-      ${brands.length > 0 ? `
+      ${homeBrands.length > 0 ? `
         <div class="brand-tiles-grid">
-          ${brands.map(b => {
-            const count = products.filter(p => (p.brand || '').toLowerCase() === b.name.toLowerCase()).length;
-            const initial = (b.name || 'B').charAt(0).toUpperCase();
-            const brandCat = b.category || '';
-            return `
-              <a class="brand-tile-card" href="/category/${slugify(brandCat)}/brand/${slugify(b.name)}" data-nav-brand-category="${brandCat}" data-nav-brand-name="${b.name}">
-                <div class="brand-tile-avatar">${b.logo ? `<img src="${b.logo}" alt="${b.name} logo" loading="lazy"/>` : initial}</div>
-                <strong class="brand-tile-name">${b.name}</strong>
-                <span class="brand-tile-count">${brandCat ? brandCat + ' · ' : ''}${count} product${count === 1 ? '' : 's'}</span>
-                <span class="brand-tile-cta">Shop Brand →</span>
-              </a>
-            `;
-          }).join('')}
+          ${homeBrands.map(brandCard).join('')}
         </div>
       ` : `
         <div class="empty-search-state" style="margin-top:20px;">
           <div class="empty-icon">🏷️</div>
           <h3>No brands added yet</h3>
-          <p>Brands will appear here once added from the Admin Portal.</p>
-          <a class="button reset-search-btn" href="/admin" style="color:#fff;text-decoration:none;">Add Brands in Admin <span>→</span></a>
+          <p>Brands will appear here when products are available.</p>
         </div>
       `}
     </section>
@@ -1141,6 +1191,78 @@ function renderBrandPage(categoryName, brandName) {
             </div>
           `}
       </div>
+    </section>
+  `;
+
+  return renderStorefrontShell(brandHtml);
+}
+
+function renderBrandsPage() {
+  const availableBrands = getAvailableBrands().sort((first, second) => first.name.localeCompare(second.name));
+  const availableLetters = new Set(availableBrands.map(brand => brand.name.charAt(0).toUpperCase()));
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+  const brandsHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">Brands</span>
+      </div>
+    </div>
+
+    <section class="page-hero-header">
+      <p class="eyebrow">Shop by brand</p>
+      <h1>Brands</h1>
+      <p class="page-subtitle">Explore our complete collection of beauty brands.</p>
+      <div class="page-meta-pills"><span class="page-pill">${availableBrands.length} brands</span></div>
+    </section>
+
+    <section class="category-brands-container brand-directory" id="brands-directory">
+      <div class="brand-directory-search">
+        <label for="brand-directory-search-input">Find a brand</label>
+        <input id="brand-directory-search-input" type="search" placeholder="Search brands..." autocomplete="off" />
+      </div>
+      <div class="brand-letter-filter" role="group" aria-label="Filter brands alphabetically">
+        <button class="active" type="button" data-brand-filter="all" aria-pressed="true">All</button>
+        ${alphabet.map(letter => `<button type="button" data-brand-filter="${letter}" aria-pressed="false" ${availableLetters.has(letter) ? '' : 'disabled'}>${letter}</button>`).join('')}
+      </div>
+      <div class="brand-tiles-grid" id="brand-directory-grid" ${availableBrands.length ? '' : 'hidden'}>
+        ${availableBrands.map(brandCard).join('')}
+      </div>
+      <p class="brand-directory-empty" id="brand-directory-empty" ${availableBrands.length ? 'hidden' : ''}>No brands found.</p>
+    </section>
+  `;
+
+  return renderStorefrontShell(brandsHtml);
+}
+
+function renderAllBrandPage(brandName) {
+  const brand = getAvailableBrands().find(item => item.name.toLowerCase() === brandName.toLowerCase());
+  const resolvedBrandName = brand?.name || brandName;
+  const brandProducts = products.filter(product => String(product.brand || '').trim().toLowerCase() === resolvedBrandName.trim().toLowerCase());
+  const brandHtml = `
+    <div class="breadcrumbs-bar">
+      <div class="breadcrumbs-inner">
+        <a href="/" data-nav-home="true">Home</a>
+        <span class="breadcrumbs-sep">/</span>
+        <a href="/brands" data-nav-page="/brands">Brands</a>
+        <span class="breadcrumbs-sep">/</span>
+        <span class="breadcrumbs-current">${escapeFooterText(resolvedBrandName)}</span>
+      </div>
+    </div>
+
+    <section class="page-hero-header">
+      <p class="eyebrow">Brand collection</p>
+      <h1>${escapeFooterText(resolvedBrandName)}</h1>
+      <p class="page-subtitle">Browse all ${escapeFooterText(resolvedBrandName)} products available in our store.</p>
+      <div class="page-meta-pills"><span class="page-pill">${brandProducts.length} product${brandProducts.length === 1 ? '' : 's'}</span></div>
+    </section>
+
+    <section class="category-brands-container">
+      ${brandProducts.length
+        ? `<div class="products">${brandProducts.map(productCard).join('')}</div>`
+        : '<p class="brand-directory-empty">No products are currently available for this brand.</p>'}
     </section>
   `;
 
@@ -2756,25 +2878,108 @@ function bindGlobalEvents() {
     };
   });
 
-  // Mobile Search Live Input
-  const mobileSearch = document.querySelector('#mobile-search-input');
-  if (mobileSearch) {
-    mobileSearch.oninput = (e) => {
-      searchQuery = e.target.value.toLowerCase().trim();
-      const grid = document.querySelector('#products-grid');
-      const title = document.querySelector('#shop-title');
-      if (grid) {
-        const filtered = searchQuery 
-          ? products.filter(p => p.name.toLowerCase().includes(searchQuery) || (p.brand || '').toLowerCase().includes(searchQuery) || p.type.toLowerCase().includes(searchQuery))
-          : products;
-        grid.innerHTML = filtered.length 
-          ? filtered.map(productCard).join('') 
-          : `<div class="empty-search-state"><p>No products found for "${searchQuery}".</p></div>`;
-        if (title) title.textContent = searchQuery ? `Search: "${searchQuery}"` : 'Best Sellers';
-        // re-bind quick adds
-        grid.querySelectorAll('.quick-add-fab').forEach(b => b.onclick = (ev) => { ev.preventDefault(); ev.stopPropagation(); add(b.dataset.add); });
-      }
+  const desktopSearchToggle = document.querySelector('#desktop-search-toggle');
+  const desktopSearchPanel = document.querySelector('#desktop-search-panel');
+  const desktopSearchInput = document.querySelector('#desktop-search-input');
+  const desktopSearchResults = document.querySelector('#desktop-search-results');
+  const mobileSearchInput = document.querySelector('#mobile-search-input');
+
+  desktopSearchToggle?.addEventListener('click', () => {
+    if (!desktopSearchPanel) return;
+    desktopSearchPanel.hidden = !desktopSearchPanel.hidden;
+    desktopSearchToggle.setAttribute('aria-expanded', String(!desktopSearchPanel.hidden));
+    if (!desktopSearchPanel.hidden) desktopSearchInput?.focus();
+  });
+
+  desktopSearchInput?.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && desktopSearchPanel) {
+      desktopSearchPanel.hidden = true;
+      desktopSearchToggle?.setAttribute('aria-expanded', 'false');
+      desktopSearchToggle?.focus();
+    }
+  });
+
+  document.querySelector('#desktop-search-form')?.addEventListener('submit', event => {
+    event.preventDefault();
+    document.querySelector('#shop')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  const updateProductSearch = value => {
+    searchQuery = String(value || '').toLowerCase().trim();
+    const searchTerms = searchQuery.split(/\s+/).filter(Boolean);
+    const filtered = searchQuery
+      ? products.filter(product => {
+        const searchableText = `${product.name || ''} ${product.brand || ''} ${product.type || ''}`.toLowerCase();
+        return searchTerms.every(term => searchableText.includes(term));
+      })
+      : products;
+    const grid = document.querySelector('#products-grid');
+    const title = document.querySelector('#shop-title');
+
+    if (grid) {
+      grid.innerHTML = filtered.length
+        ? filtered.map(productCard).join('')
+        : `<div class="empty-search-state"><p>No products found for "${escapeFooterText(searchQuery)}".</p></div>`;
+      if (title) title.textContent = searchQuery ? `Search: "${searchQuery}"` : 'Best Sellers';
+      grid.querySelectorAll('.quick-add-fab').forEach(button => {
+        button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          add(button.dataset.add);
+        };
+      });
+    }
+
+    if (desktopSearchResults) {
+      desktopSearchResults.hidden = !searchQuery;
+      desktopSearchResults.innerHTML = searchQuery
+        ? filtered.length
+          ? filtered.map(product => `
+            <a class="desktop-search-result" href="/product/${encodeURIComponent(product.id)}" data-nav-product="${escapeFooterText(String(product.id))}">
+              <img src="${escapeFooterText(String(product.image || ''))}" alt="" />
+              <span><strong>${escapeFooterText(String(product.name || ''))}</strong><small>${escapeFooterText(String(product.brand || product.type || ''))}</small></span>
+              <b>${money(product.price)}</b>
+            </a>
+          `).join('')
+          : '<p class="desktop-search-empty">No products found.</p>'
+        : '';
+    }
+  };
+
+  [desktopSearchInput, mobileSearchInput].filter(Boolean).forEach(input => {
+    input.addEventListener('input', event => updateProductSearch(event.currentTarget.value));
+  });
+
+  const brandDirectory = document.querySelector('#brands-directory');
+  if (brandDirectory) {
+    const brandSearchInput = brandDirectory.querySelector('#brand-directory-search-input');
+    const brandCards = Array.from(brandDirectory.querySelectorAll('.brand-tile-card'));
+    const emptyMessage = brandDirectory.querySelector('#brand-directory-empty');
+    let activeBrandLetter = 'all';
+    const filterBrandCards = () => {
+      const query = (brandSearchInput?.value || '').trim().toLowerCase();
+      let visibleCount = 0;
+      brandCards.forEach(card => {
+        const matchesName = card.dataset.brandName.toLowerCase().includes(query);
+        const matchesLetter = activeBrandLetter === 'all' || card.dataset.brandLetter === activeBrandLetter;
+        card.hidden = !matchesName || !matchesLetter;
+        if (!card.hidden) visibleCount++;
+      });
+      if (emptyMessage) emptyMessage.hidden = visibleCount > 0;
     };
+
+    brandSearchInput?.addEventListener('input', filterBrandCards);
+    brandDirectory.querySelectorAll('[data-brand-filter]').forEach(button => {
+      button.addEventListener('click', () => {
+        activeBrandLetter = button.dataset.brandFilter;
+        brandDirectory.querySelectorAll('[data-brand-filter]').forEach(filterButton => {
+          const active = filterButton === button;
+          filterButton.classList.toggle('active', active);
+          filterButton.setAttribute('aria-pressed', String(active));
+        });
+        filterBrandCards();
+      });
+    });
   }
 
   // FAQ Accordion Triggers
@@ -2915,9 +3120,17 @@ export function renderApp() {
     ? `${route.documentTitle} | Glass Skin Store`
     : route.view === 'contact'
       ? 'Contact Us | Glass Skin Store'
+      : route.view === 'brands'
+        ? 'Brands | Glass Skin Store'
+        : route.view === 'all-brand'
+          ? `${route.brand} | Glass Skin Store`
       : 'Glass Skin Store — Elegance in Every Detail';
 
-  if (route.view === 'product') {
+  if (route.view === 'brands') {
+    document.querySelector('#app').innerHTML = renderBrandsPage();
+  } else if (route.view === 'all-brand') {
+    document.querySelector('#app').innerHTML = renderAllBrandPage(route.brand);
+  } else if (route.view === 'product') {
     document.querySelector('#app').innerHTML = renderProductPage(route.productId);
   } else if (route.view === 'brand') {
     document.querySelector('#app').innerHTML = renderBrandPage(route.category, route.brand);
